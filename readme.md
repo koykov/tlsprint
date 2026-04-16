@@ -1,5 +1,5 @@
-# JAX
+# TLSprint
 
-JA3/JA4 parsing library.
+TLS fingerprint toolkit library.
 
 TODO...
