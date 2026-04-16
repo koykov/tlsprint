@@ -1,10 +1,22 @@
 package tlsprint
 
+import "github.com/koykov/byteconv"
+
 type Ctx struct {
 	raw  []byte
 	ptyp PacketType
 	plen uint16
 	// ...
+}
+
+func (ctx *Ctx) Parse(raw []byte) error {
+	ctx.raw = raw
+	// todo implement me
+	return nil
+}
+
+func (ctx *Ctx) ParseString(raw string) error {
+	return ctx.Parse(byteconv.S2B(raw))
 }
 
 func (ctx *Ctx) PacketType() PacketType {
