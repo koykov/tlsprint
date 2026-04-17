@@ -11,6 +11,9 @@ const (
 )
 
 func (pt PacketType) String() string {
+	if pt > PacketTypeServerHello {
+		return ptyps[PacketTypeUnknown]
+	}
 	return ptyps[pt]
 }
 
