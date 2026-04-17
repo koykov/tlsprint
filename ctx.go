@@ -6,7 +6,7 @@ type Ctx struct {
 	raw  []byte
 	off  uint16
 	ptyp PacketType
-	plen uint16
+	plen uint32
 	// ...
 }
 
