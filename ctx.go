@@ -4,6 +4,7 @@ import "github.com/koykov/byteconv"
 
 type Ctx struct {
 	raw  []byte
+	off  uint16
 	ptyp PacketType
 	plen uint16
 	// ...
