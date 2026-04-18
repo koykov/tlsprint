@@ -9,6 +9,7 @@ type Ctx struct {
 	plen uint32
 	ver  uint32
 	crnd []byte
+	sid  []byte
 	// ...
 }
 
@@ -33,6 +34,10 @@ func (ctx *Ctx) Parse(raw []byte) (err error) {
 	}
 	ctx.crnd = ctx.raw[ctx.off : ctx.off+64]
 	ctx.off += 64
+
+	if err = ctx.parseSessionID(); err != nil {
+		return
+	}
 
 	return
 }
