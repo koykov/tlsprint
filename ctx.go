@@ -10,6 +10,7 @@ type Ctx struct {
 	ver  uint32
 	crnd []byte
 	sid  []byte
+	chps []uint16
 	// ...
 }
 
@@ -56,5 +57,7 @@ func (ctx *Ctx) Reset() {
 	ctx.plen = 0
 	ctx.ver = 0
 	ctx.crnd = ctx.crnd[:0]
+	ctx.sid = ctx.sid[:0]
+	ctx.chps = ctx.chps[:0]
 	// ...
 }
