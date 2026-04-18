@@ -25,7 +25,7 @@ func (ctx *Ctx) parsePacketType() error {
 	if len(raw) < 2 {
 		return ErrTooShort
 	}
-	pt := binary.LittleEndian.Uint16(raw[ctx.off : ctx.off+2])
+	pt := binary.LittleEndian.Uint16(raw[:2])
 	ctx.off += 2
 	switch pt {
 	case pt01:

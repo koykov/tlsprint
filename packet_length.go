@@ -5,7 +5,7 @@ func (ctx *Ctx) parsePacketLength() error {
 	if len(raw) < 6 {
 		return ErrTooShort
 	}
-	pl, err := x2u(raw[ctx.off : ctx.off+6])
+	pl, err := x2u(raw[:6])
 	ctx.off += 6
 	ctx.plen = uint32(pl)
 	return err
