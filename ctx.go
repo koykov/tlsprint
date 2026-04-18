@@ -7,6 +7,7 @@ type Ctx struct {
 	off  uint16
 	ptyp PacketType
 	plen uint32
+	ver  uint32
 	// ...
 }
 
