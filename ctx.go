@@ -8,13 +8,33 @@ type Ctx struct {
 	ptyp PacketType
 	plen uint32
 	ver  uint32
+	crnd []byte
 	// ...
 }
 
-func (ctx *Ctx) Parse(raw []byte) error {
+func (ctx *Ctx) Parse(raw []byte) (err error) {
+	ctx.Reset()
 	ctx.raw = raw
-	// todo implement me
-	return nil
+	rl := uint16(len(raw))
+
+	if err = ctx.parsePacketType(); err != nil {
+		return
+	}
+	if err = ctx.parsePacketLength(); err != nil {
+		return
+	}
+	if err = ctx.parseTLSVersion(); err != nil {
+		return
+	}
+
+	if rl-ctx.off < 64 {
+		err = ErrTooShort
+		return
+	}
+	ctx.crnd = ctx.raw[ctx.off : ctx.off+64]
+	ctx.off += 64
+
+	return
 }
 
 func (ctx *Ctx) ParseString(raw string) error {
@@ -29,5 +49,7 @@ func (ctx *Ctx) Reset() {
 	ctx.raw = ctx.raw[:0]
 	ctx.ptyp = PacketTypeUnknown
 	ctx.plen = 0
+	ctx.ver = 0
+	ctx.crnd = ctx.crnd[:0]
 	// ...
 }
