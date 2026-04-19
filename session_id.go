@@ -1,19 +1,19 @@
 package tlsprint
 
-func (ctx *Ctx) parseSessionID() error {
-	raw := ctx.raw[ctx.off:]
+func (vec *vector) parseSessionID() error {
+	raw := vec.raw[vec.off:]
 	if len(raw) < 2 {
 		return ErrTooShort
 	}
 	ln, err := x2u(raw[:2])
-	ctx.off += 2
-	raw = ctx.raw[ctx.off:]
+	vec.off += 2
+	raw = vec.raw[vec.off:]
 	if err != nil {
 		return err
 	}
 	if uint64(len(raw)) < ln*2 {
 		return ErrTooShort
 	}
-	ctx.sid = raw[:ln*2]
+	vec.sid = raw[:ln*2]
 	return nil
 }

@@ -2,13 +2,13 @@ package tlsprint
 
 import "sync"
 
-var p = sync.Pool{New: func() any { return &Ctx{} }}
+var p = sync.Pool{New: func() any { return &vector{} }}
 
-func AcquireCtx() *Ctx {
-	return p.Get().(*Ctx)
+func Acquire() Interface {
+	return p.Get().(*vector)
 }
 
-func ReleaseCtx(ctx *Ctx) {
+func Release(ctx Interface) {
 	ctx.Reset()
 	p.Put(ctx)
 }

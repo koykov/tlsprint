@@ -1,11 +1,11 @@
 package tlsprint
 
-func (ctx *Ctx) parseClientRandom() error {
-	raw := ctx.raw[ctx.off:]
+func (vec *vector) parseClientRandom() error {
+	raw := vec.raw[vec.off:]
 	if len(raw) < 64 {
 		return ErrTooShort
 	}
-	ctx.crnd = raw[:64]
-	ctx.off += 64
+	vec.crnd = raw[:64]
+	vec.off += 64
 	return nil
 }

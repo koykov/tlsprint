@@ -9,8 +9,8 @@ type Extension struct {
 	Data []byte
 }
 
-func (ctx *Ctx) parseExtensions() error {
-	raw := ctx.raw[ctx.off:]
+func (vec *vector) parseExtensions() error {
+	raw := vec.raw[vec.off:]
 	if len(raw) < 4 {
 		return ErrTooShort
 	}
@@ -18,8 +18,8 @@ func (ctx *Ctx) parseExtensions() error {
 	if err != nil {
 		return err
 	}
-	ctx.off += 4
-	raw = ctx.raw[ctx.off:]
+	vec.off += 4
+	raw = vec.raw[vec.off:]
 	var off uint64
 	for off < ln*2 {
 		var ext Extension
@@ -27,15 +27,15 @@ func (ctx *Ctx) parseExtensions() error {
 			return ErrTooShort
 		}
 		ext.Type = ExtensionType(binary.LittleEndian.Uint16(raw[:2]))
-		ctx.off += 2
-		raw = ctx.raw[ctx.off:]
+		vec.off += 2
+		raw = vec.raw[vec.off:]
 
 		if len(raw) < 2 {
 			return ErrTooShort
 		}
 		eln, err := x2u(raw[:2])
-		ctx.off += 2
-		raw = ctx.raw[ctx.off:]
+		vec.off += 2
+		raw = vec.raw[vec.off:]
 		if err != nil {
 			return err
 		}
@@ -43,8 +43,8 @@ func (ctx *Ctx) parseExtensions() error {
 			return ErrTooShort
 		}
 		ext.Data = raw[:eln*2]
-		ctx.off += uint16(eln * 2)
-		raw = ctx.raw[ctx.off:]
+		vec.off += uint16(eln * 2)
+		raw = vec.raw[vec.off:]
 
 	}
 	return nil

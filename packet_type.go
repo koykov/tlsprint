@@ -20,18 +20,18 @@ func (pt PacketType) String() string {
 	return ptyps[pt]
 }
 
-func (ctx *Ctx) parsePacketType() error {
-	raw := ctx.raw[ctx.off:]
+func (vec *vector) parsePacketType() error {
+	raw := vec.raw[vec.off:]
 	if len(raw) < 2 {
 		return ErrTooShort
 	}
 	pt := binary.LittleEndian.Uint16(raw[:2])
-	ctx.off += 2
+	vec.off += 2
 	switch pt {
 	case pt01:
-		ctx.ptyp = PacketTypeClientHello
+		vec.ptyp = PacketTypeClientHello
 	case pt02:
-		ctx.ptyp = PacketTypeServerHello
+		vec.ptyp = PacketTypeServerHello
 	default:
 		return ErrUnknownPacketType
 	}
