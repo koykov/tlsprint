@@ -7,13 +7,16 @@ func x2u(p []byte) (r uint64, err error) {
 	if n == 0 {
 		return
 	}
-	if n > 15 {
+	if n > 16 {
 		err = ErrHexTooLong
 		return
 	}
-	_ = p[n-1]
-	for i := 0; i < n; i++ {
-		r = dig16[p[i]] * pow16[i]
+	for i := n - 1; i >= 0; i-- {
+		d := dig16[p[i]]
+		if d > 15 {
+			return 0, ErrHexBadByte
+		}
+		r += d * pow16[i]
 	}
 	return
 }
@@ -41,6 +44,9 @@ var (
 )
 
 func init() {
+	for i := uint8(0); i < math.MaxUint8; i++ {
+		dig16[i] = math.MaxUint8
+	}
 	dig16['0'] = 0
 	dig16['1'] = 1
 	dig16['2'] = 2
