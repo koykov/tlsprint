@@ -5,14 +5,14 @@ import "github.com/koykov/byteconv"
 type Ctx struct {
 	raw  []byte
 	off  uint16
-	ptyp PacketType // packet type
-	plen uint32     // packet length
-	ver  uint32     // TLS version
-	crnd []byte     // client random
-	sid  []byte     // session ID
-	chps []uint16   // cipher suites
-	cmps []byte     // compression method
-	ext  []Extension
+	ptyp PacketType  // packet type
+	plen uint32      // packet length
+	ver  uint32      // TLS version
+	crnd []byte      // client random
+	sid  []byte      // session ID
+	chps []uint16    // cipher suites
+	cmps []byte      // compression method
+	ext  []Extension // extensions
 }
 
 func (ctx *Ctx) Parse(raw []byte) (err error) {
