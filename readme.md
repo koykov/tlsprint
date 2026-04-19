@@ -1,5 +1,5 @@
-# TLSprint
+# TLS vector
 
-TLS fingerprint toolkit library.
+TLS parser and fingerprinting library.
 
 TODO...

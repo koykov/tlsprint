@@ -1,4 +1,4 @@
-module github.com/koykov/tlsprint
+module github.com/koykov/tlsvector
 
 go 1.22
 
