@@ -16,9 +16,20 @@ type Ctx struct {
 }
 
 func (ctx *Ctx) Parse(raw []byte) (err error) {
+	rl := uint16(len(raw))
+	if rl == 0 {
+		return ErrNoData
+	}
+	if raw[0] == 0x16 {
+		// Record header found, so skip it.
+		if rl < 5 {
+			return ErrTooShort
+		}
+		raw = raw[5:]
+		rl -= 5
+	}
 	ctx.Reset()
 	ctx.raw = raw
-	rl := uint16(len(raw))
 
 	if err = ctx.parsePacketType(); err != nil {
 		return
