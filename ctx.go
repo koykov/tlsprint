@@ -12,7 +12,7 @@ type Ctx struct {
 	sid  []byte     // session ID
 	chps []uint16   // cipher suites
 	cmps []byte     // compression method
-	// ...
+	ext  []Extension
 }
 
 func (ctx *Ctx) Parse(raw []byte) (err error) {
@@ -47,10 +47,15 @@ func (ctx *Ctx) Parse(raw []byte) (err error) {
 	if err = ctx.parseSessionID(); err != nil {
 		return
 	}
+	if err = ctx.parseCipherSuites(); err != nil {
+		return
+	}
 	if err = ctx.parseCompressionMethod(); err != nil {
 		return
 	}
-
+	if err = ctx.parseExtensions(); err != nil {
+		return
+	}
 	return
 }
 
@@ -71,5 +76,5 @@ func (ctx *Ctx) Reset() {
 	ctx.sid = ctx.sid[:0]
 	ctx.chps = ctx.chps[:0]
 	ctx.cmps = ctx.cmps[:0]
-	// ...
+	ctx.ext = ctx.ext[:0]
 }
