@@ -12,7 +12,7 @@ func x2u(p []byte) (r uint64, err error) {
 		err = ErrHexTooLong
 		return
 	}
-	_ = p[n-1]
+	_, _ = p[n-1], dig16[math.MaxUint8-1]
 	for i := 0; i < n; i++ {
 		d := dig16[p[i]]
 		if d > 15 {
