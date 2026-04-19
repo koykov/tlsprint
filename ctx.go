@@ -28,6 +28,7 @@ func (ctx *Ctx) Parse(raw []byte) (err error) {
 		raw = raw[5:]
 		rl -= 5
 	}
+
 	ctx.Reset()
 	ctx.raw = raw
 
@@ -40,18 +41,12 @@ func (ctx *Ctx) Parse(raw []byte) (err error) {
 	if err = ctx.parseTLSVersion(); err != nil {
 		return
 	}
-
-	if rl-ctx.off < 64 {
-		err = ErrTooShort
-		return
+	if err = ctx.parseClientRandom(); err != nil {
+		return err
 	}
-	ctx.crnd = ctx.raw[ctx.off : ctx.off+64]
-	ctx.off += 64
-
 	if err = ctx.parseSessionID(); err != nil {
 		return
 	}
-
 	if err = ctx.parseCompressionMethod(); err != nil {
 		return
 	}
