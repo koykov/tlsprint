@@ -1,8 +1,18 @@
 package tlsvector
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+
+	"github.com/koykov/byteconv"
+)
 
 type CipherSuite uint16
+
+func (cs CipherSuite) String() string {
+	enc := __cs[cs]
+	lo, hi := uint16(enc>>16), uint16(enc)
+	return byteconv.B2S(__cs_buf[lo:hi])
+}
 
 func (vec *vector) parseCipherSuites(off uint32) (_ uint32, err error) {
 	var raw []byte
