@@ -17,6 +17,7 @@ type Interface interface {
 
 	MessageType() MessageType
 	MessageLength() uint32
+	LegacyVersion() uint16
 	// todo describe getters
 }
 
@@ -28,9 +29,9 @@ type vector struct {
 	rver uint16     // record version (legacy)
 	rlen uint16     // record length (including handshake header)
 
-	mtyp MessageType // packet type
-	mlen uint32      // packet length
-	ver  uint32      // TLS version
+	mtyp MessageType // message type
+	mlen uint32      // message length
+	mver uint16      // TLS version (legacy)
 	crnd []byte      // client random
 	sid  []byte      // session ID
 	chps []uint16    // cipher suites
@@ -53,7 +54,7 @@ func (vec *vector) Parse(raw []byte) (err error) {
 	if off, err = vec.parseHandshakeHeader(off); err != nil {
 		return
 	}
-	if err = vec.parseTLSVersion(); err != nil {
+	if off, err = vec.parseTLSVersion(off); err != nil {
 		return
 	}
 	if err = vec.parseClientRandom(); err != nil {
@@ -98,6 +99,10 @@ func (vec *vector) MessageLength() uint32 {
 	return vec.mlen
 }
 
+func (vec *vector) LegacyVersion() uint16 {
+	return vec.mver
+}
+
 func (vec *vector) Reset() {
 	vec.raw = vec.raw[:0]
 
@@ -107,7 +112,7 @@ func (vec *vector) Reset() {
 
 	vec.mtyp = MessageTypeUnknown
 	vec.mlen = 0
-	vec.ver = 0
+	vec.mver = 0
 	vec.crnd = vec.crnd[:0]
 	vec.sid = vec.sid[:0]
 	vec.chps = vec.chps[:0]

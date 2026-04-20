@@ -1,12 +1,14 @@
 package tlsprint
 
-func (vec *vector) parseTLSVersion() error {
-	raw := vec.raw[vec.off:]
-	if len(raw) < 4 {
-		return ErrTooShort
+import (
+	"encoding/binary"
+)
+
+func (vec *vector) parseTLSVersion(off uint32) (_ uint32, err error) {
+	var raw []byte
+	if raw, off, err = vec.cut(off, 2); err != nil {
+		return off, err
 	}
-	ver, err := x2u(raw[:4])
-	vec.off += 4
-	vec.ver = uint32(ver)
-	return err
+	vec.mver = binary.LittleEndian.Uint16(raw)
+	return off, err
 }
