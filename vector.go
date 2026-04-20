@@ -1,6 +1,10 @@
 package tlsprint
 
-import "github.com/koykov/byteconv"
+import (
+	"io"
+
+	"github.com/koykov/byteconv"
+)
 
 type Interface interface {
 	Parse(p []byte) error
@@ -11,8 +15,13 @@ type Interface interface {
 }
 
 type vector struct {
-	raw  []byte
-	off  uint16
+	raw []byte
+	off uint16
+
+	rtyp   RecordType
+	protov uint16
+	hslen  uint16
+
 	ptyp PacketType  // packet type
 	plen uint32      // packet length
 	ver  uint32      // TLS version
@@ -43,7 +52,11 @@ func (vec *vector) Parse(raw []byte) (err error) {
 
 	vec.Reset()
 	vec.raw = raw
+	var off uint32
 
+	if off, err = vec.parseRecordHeader(off); err != nil {
+		return
+	}
 	if err = vec.parsePacketType(); err != nil {
 		return
 	}
@@ -81,6 +94,11 @@ func (vec *vector) PacketType() PacketType {
 
 func (vec *vector) Reset() {
 	vec.raw = vec.raw[:0]
+
+	vec.rtyp = RecordTypeUnknown
+	vec.protov = 0
+	vec.hslen = 0
+
 	vec.ptyp = PacketTypeUnknown
 	vec.plen = 0
 	vec.ver = 0
@@ -89,4 +107,11 @@ func (vec *vector) Reset() {
 	vec.chps = vec.chps[:0]
 	vec.cmps = vec.cmps[:0]
 	vec.ext = vec.ext[:0]
+}
+
+func (vec *vector) cut(off, delta uint32) ([]byte, uint32, error) {
+	if uint32(len(vec.raw)) >= off+delta {
+		return nil, off, io.ErrUnexpectedEOF
+	}
+	return vec.raw[off : off+delta], off + delta, nil
 }

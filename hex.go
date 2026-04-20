@@ -23,6 +23,11 @@ func x2u(p []byte) (r uint64, err error) {
 	return
 }
 
+func x2u16(p []byte) (uint16, error) {
+	v, err := x2u(p)
+	return uint16(v), err
+}
+
 var dig16 [math.MaxUint8]uint64
 
 func init() {
