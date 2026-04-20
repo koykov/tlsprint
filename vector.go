@@ -10,6 +10,9 @@ type Interface interface {
 	Parse(p []byte) error
 	ParseString(s string) error
 	Reset()
+	RecordType() RecordType
+	ProtocolVersion() uint16
+	HandshakeLength() uint16
 	PacketType() PacketType
 	// todo describe getters
 }
@@ -86,6 +89,18 @@ func (vec *vector) Parse(raw []byte) (err error) {
 
 func (vec *vector) ParseString(raw string) error {
 	return vec.Parse(byteconv.S2B(raw))
+}
+
+func (vec *vector) RecordType() RecordType {
+	return vec.rtyp
+}
+
+func (vec *vector) ProtocolVersion() uint16 {
+	return vec.protov
+}
+
+func (vec *vector) HandshakeLength() uint16 {
+	return vec.hslen
 }
 
 func (vec *vector) PacketType() PacketType {

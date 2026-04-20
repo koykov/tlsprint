@@ -2,6 +2,7 @@ package tlsprint
 
 import (
 	"encoding/binary"
+	"io"
 	"math"
 )
 
@@ -18,6 +19,9 @@ func (rt RecordType) String() string {
 
 func (vec *vector) parseRecordHeader(off uint32) (_ uint32, err error) {
 	raw := vec.raw[off:]
+	if len(raw) == 0 {
+		return off, io.ErrUnexpectedEOF
+	}
 	if raw[0] != 0x16 {
 		// Record header not found.
 		vec.rtyp = RecordTypeUnknown
