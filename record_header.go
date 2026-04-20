@@ -35,12 +35,12 @@ func (vec *vector) parseRecordHeader(off uint32) (_ uint32, err error) {
 	if raw, off, err = vec.cut(off, 2); err != nil {
 		return off, err
 	}
-	vec.protov = binary.LittleEndian.Uint16(raw)
+	vec.rver = binary.LittleEndian.Uint16(raw)
 	// Read handshake length.
 	if raw, off, err = vec.cut(off, 2); err != nil {
 		return off, err
 	}
-	vec.hslen, err = x2u16(raw)
+	vec.rlen, err = x2u16(raw)
 
 	return off, err
 }

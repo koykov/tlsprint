@@ -24,9 +24,9 @@ type vector struct {
 	raw []byte
 	off uint16
 
-	rtyp   RecordType // record type (always handshake)
-	protov uint16     // protocol version
-	hslen  uint16     // handshake length
+	rtyp RecordType // record type (always handshake)
+	rver uint16     // record version (legacy)
+	rlen uint16     // record length (including handshake header)
 
 	mtyp MessageType // packet type
 	mlen uint32      // packet length
@@ -96,11 +96,11 @@ func (vec *vector) RecordType() RecordType {
 }
 
 func (vec *vector) RecordLegacyVersion() uint16 {
-	return vec.protov
+	return vec.rver
 }
 
 func (vec *vector) RecordLength() uint16 {
-	return vec.hslen
+	return vec.rlen
 }
 
 func (vec *vector) MessageType() MessageType {
@@ -115,8 +115,8 @@ func (vec *vector) Reset() {
 	vec.raw = vec.raw[:0]
 
 	vec.rtyp = RecordTypeUnknown
-	vec.protov = 0
-	vec.hslen = 0
+	vec.rver = 0
+	vec.rlen = 0
 
 	vec.mtyp = MessageTypeUnknown
 	vec.mlen = 0
