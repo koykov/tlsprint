@@ -25,7 +25,7 @@ func (vec *vector) parseRecordHeader(off uint32) (_ uint32, err error) {
 	if raw[0] != 0x16 {
 		// Record header not found.
 		vec.rtyp = RecordTypeUnknown
-		return off, nil
+		return off, ErrNoHandshake
 	}
 
 	// Byte at position is 0x16 - handshake type.

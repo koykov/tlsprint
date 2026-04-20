@@ -26,7 +26,9 @@ func (vec *vector) parseHandshakeHeader(off uint32) (_ uint32, err error) {
 		return off, io.ErrUnexpectedEOF
 	}
 	// Read message type byte.
-	vec.mtyp = MessageType(raw[0])
+	if vec.mtyp = MessageType(raw[0]); vec.mtyp == MessageTypeUnknown {
+		return off, ErrNoHello
+	}
 	off++
 	// Read message length.
 	if raw, off, err = vec.cut(off, 3); err != nil {
