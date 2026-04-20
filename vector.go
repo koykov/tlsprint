@@ -12,8 +12,8 @@ type Interface interface {
 	Reset()
 
 	RecordType() RecordType
-	ProtocolVersion() uint16
-	HandshakeLength() uint16
+	RecordLegacyVersion() uint16
+	RecordLength() uint16
 
 	MessageType() MessageType
 	MessageLength() uint32
@@ -95,11 +95,11 @@ func (vec *vector) RecordType() RecordType {
 	return vec.rtyp
 }
 
-func (vec *vector) ProtocolVersion() uint16 {
+func (vec *vector) RecordLegacyVersion() uint16 {
 	return vec.protov
 }
 
-func (vec *vector) HandshakeLength() uint16 {
+func (vec *vector) RecordLength() uint16 {
 	return vec.hslen
 }
 
