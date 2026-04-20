@@ -1,4 +1,4 @@
-package tlsprint
+package tlsvector
 
 func (vec *vector) parseClientRandom(off uint32) (_ uint32, err error) {
 	var raw []byte

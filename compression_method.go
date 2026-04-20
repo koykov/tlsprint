@@ -1,4 +1,4 @@
-package tlsprint
+package tlsvector
 
 func (vec *vector) parseCompressionMethod() error {
 	raw := vec.raw[vec.off:]

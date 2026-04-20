@@ -1,4 +1,4 @@
-package tlsprint
+package tlsvector
 
 import "encoding/binary"
 
