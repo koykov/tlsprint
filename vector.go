@@ -10,10 +10,13 @@ type Interface interface {
 	Parse(p []byte) error
 	ParseString(s string) error
 	Reset()
+
 	RecordType() RecordType
 	ProtocolVersion() uint16
 	HandshakeLength() uint16
-	PacketType() PacketType
+
+	MessageType() MessageType
+	MessageLength() uint32
 	// todo describe getters
 }
 
@@ -21,12 +24,12 @@ type vector struct {
 	raw []byte
 	off uint16
 
-	rtyp   RecordType
-	protov uint16
-	hslen  uint16
+	rtyp   RecordType // record type (always handshake)
+	protov uint16     // protocol version
+	hslen  uint16     // handshake length
 
-	ptyp PacketType  // packet type
-	plen uint32      // packet length
+	mtyp MessageType // packet type
+	mlen uint32      // packet length
 	ver  uint32      // TLS version
 	crnd []byte      // client random
 	sid  []byte      // session ID
@@ -60,10 +63,7 @@ func (vec *vector) Parse(raw []byte) (err error) {
 	if off, err = vec.parseRecordHeader(off); err != nil {
 		return
 	}
-	if err = vec.parsePacketType(); err != nil {
-		return
-	}
-	if err = vec.parsePacketLength(); err != nil {
+	if off, err = vec.parseHandshakeHeader(off); err != nil {
 		return
 	}
 	if err = vec.parseTLSVersion(); err != nil {
@@ -103,8 +103,12 @@ func (vec *vector) HandshakeLength() uint16 {
 	return vec.hslen
 }
 
-func (vec *vector) PacketType() PacketType {
-	return vec.ptyp
+func (vec *vector) MessageType() MessageType {
+	return vec.mtyp
+}
+
+func (vec *vector) MessageLength() uint32 {
+	return vec.mlen
 }
 
 func (vec *vector) Reset() {
@@ -114,8 +118,8 @@ func (vec *vector) Reset() {
 	vec.protov = 0
 	vec.hslen = 0
 
-	vec.ptyp = PacketTypeUnknown
-	vec.plen = 0
+	vec.mtyp = MessageTypeUnknown
+	vec.mlen = 0
 	vec.ver = 0
 	vec.crnd = vec.crnd[:0]
 	vec.sid = vec.sid[:0]
