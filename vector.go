@@ -19,6 +19,7 @@ type Interface interface {
 	MessageLength() uint32
 	LegacyVersion() uint16
 	Random() []byte
+	SessionID() []byte
 	// todo describe getters
 }
 
@@ -61,7 +62,7 @@ func (vec *vector) Parse(raw []byte) (err error) {
 	if off, err = vec.parseClientRandom(off); err != nil {
 		return err
 	}
-	if err = vec.parseSessionID(); err != nil {
+	if off, err = vec.parseSessionID(off); err != nil {
 		return
 	}
 	if err = vec.parseCipherSuites(); err != nil {
@@ -106,6 +107,10 @@ func (vec *vector) LegacyVersion() uint16 {
 
 func (vec *vector) Random() []byte {
 	return vec.rand
+}
+
+func (vec *vector) SessionID() []byte {
+	return vec.sid
 }
 
 func (vec *vector) Reset() {
