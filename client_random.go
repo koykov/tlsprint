@@ -1,11 +1,10 @@
 package tlsprint
 
-func (vec *vector) parseClientRandom() error {
-	raw := vec.raw[vec.off:]
-	if len(raw) < 64 {
-		return ErrTooShort
+func (vec *vector) parseClientRandom(off uint32) (_ uint32, err error) {
+	var raw []byte
+	if raw, off, err = vec.cut(off, 32); err != nil {
+		return off, err
 	}
-	vec.crnd = raw[:64]
-	vec.off += 64
-	return nil
+	vec.rand = raw
+	return off, err
 }
