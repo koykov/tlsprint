@@ -31,14 +31,14 @@ type vector struct {
 	rver uint16     // record version (legacy)
 	rlen uint16     // record length (including handshake header)
 
-	mtyp MessageType // message type
-	mlen uint32      // message length
-	mver uint16      // TLS version (legacy)
-	rand []byte      // client random
-	sid  []byte      // session ID
-	chps []uint16    // cipher suites
-	cmps []byte      // compression method
-	ext  []Extension // extensions
+	mtyp MessageType   // message type
+	mlen uint32        // message length
+	mver uint16        // TLS version (legacy)
+	rand []byte        // client random
+	sid  []byte        // session ID
+	chps []CipherSuite // cipher suites
+	cmps []byte        // compression method
+	ext  []Extension   // extensions
 }
 
 func New() Interface {
@@ -65,7 +65,7 @@ func (vec *vector) Parse(raw []byte) (err error) {
 	if off, err = vec.parseSessionID(off); err != nil {
 		return
 	}
-	if err = vec.parseCipherSuites(); err != nil {
+	if off, err = vec.parseCipherSuites(off); err != nil {
 		return
 	}
 	if err = vec.parseCompressionMethod(); err != nil {
@@ -111,6 +111,10 @@ func (vec *vector) Random() []byte {
 
 func (vec *vector) SessionID() []byte {
 	return vec.sid
+}
+
+func (vec *vector) CipherSuites() []CipherSuite {
+	return vec.chps
 }
 
 func (vec *vector) Reset() {

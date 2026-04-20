@@ -1,24 +1,20 @@
 package tlsprint
 
-func (vec *vector) parseCipherSuites() error {
-	raw := vec.raw[vec.off:]
-	if len(raw) < 4 {
-		return ErrTooShort
+import "encoding/binary"
+
+type CipherSuite uint16
+
+func (vec *vector) parseCipherSuites(off uint32) (_ uint32, err error) {
+	var raw []byte
+	if raw, off, err = vec.cut(off, 2); err != nil {
+		return off, err
 	}
-	ln, err := x2u(raw[:4])
-	vec.off += 4
-	raw = vec.raw[vec.off:]
-	if err != nil {
-		return err
-	}
-	raw = raw[:ln*2]
-	for off := 0; off+4 < len(raw); {
-		cs, err := x2u(raw[off : off+4])
-		if err != nil {
-			return err
+	n := binary.LittleEndian.Uint16(raw)
+	for i := uint16(0); i < n; i++ {
+		if raw, off, err = vec.cut(off, 2); err != nil {
+			return off, err
 		}
-		vec.chps = append(vec.chps, uint16(cs))
-		off += 4
+		vec.chps = append(vec.chps, CipherSuite(binary.LittleEndian.Uint16(raw)))
 	}
-	return nil
+	return off, err
 }
