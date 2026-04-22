@@ -1,7 +1,6 @@
 package tlsvector
 
 import (
-	"io"
 	"math"
 )
 
@@ -21,20 +20,16 @@ func (mt MessageType) String() string {
 }
 
 func (vec *vector) parseHandshakeHeader(off uint32) (_ uint32, err error) {
-	raw := vec.raw[off:]
-	if len(raw) == 0 {
-		return off, io.ErrUnexpectedEOF
+	var raw []byte
+	if raw, off, err = vec.cut(off, 4); err != nil {
+		return off, err
 	}
 	// Read message type byte.
 	if vec.mtyp = MessageType(raw[0]); vec.mtyp == MessageTypeUnknown {
 		return off, ErrNoHello
 	}
-	off++
 	// Read message length.
-	if raw, off, err = vec.cut(off, 3); err != nil {
-		return off, err
-	}
-	vec.mlen = uint32(raw[0]) | uint32(raw[1])<<8 | uint32(raw[2])<<16
+	vec.mlen = uint32(raw[3]) | uint32(raw[2])<<8 | uint32(raw[1])<<16
 
 	return off, err
 }
