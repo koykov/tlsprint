@@ -15,10 +15,11 @@ func (vec *vector) parseExtensions(off uint32) (_ uint32, err error) {
 		return off, err
 	}
 	ln := binary.BigEndian.Uint16(raw)
-	for i := uint16(0); i < ln; i++ {
+	for i := uint16(0); i < ln; {
 		if raw, off, err = vec.cut(off, 4); err != nil {
 			return off, err
 		}
+		i += 4
 		var e Extension
 		e.Type = ExtensionType(binary.BigEndian.Uint16(raw[0:2]))
 		eln := binary.BigEndian.Uint16(raw[2:4])
@@ -27,6 +28,7 @@ func (vec *vector) parseExtensions(off uint32) (_ uint32, err error) {
 		}
 		e.Data = raw
 		vec.ext = append(vec.ext, e)
+		i += eln
 	}
 
 	return off, nil
