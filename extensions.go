@@ -9,43 +9,25 @@ type Extension struct {
 	Data []byte
 }
 
-func (vec *vector) parseExtensions() error {
-	raw := vec.raw[vec.off:]
-	if len(raw) < 4 {
-		return ErrTooShort
+func (vec *vector) parseExtensions(off uint32) (_ uint32, err error) {
+	var raw []byte
+	if raw, off, err = vec.cut(off, 2); err != nil {
+		return off, err
 	}
-	ln, err := x2u(raw[:4])
-	if err != nil {
-		return err
-	}
-	vec.off += 4
-	raw = vec.raw[vec.off:]
-	var off uint64
-	for off < ln*2 {
-		var ext Extension
-		if len(raw) < 2 {
-			return ErrTooShort
+	ln := binary.BigEndian.Uint16(raw)
+	for i := uint16(0); i < ln; i++ {
+		if raw, off, err = vec.cut(off, 4); err != nil {
+			return off, err
 		}
-		ext.Type = ExtensionType(binary.LittleEndian.Uint16(raw[:2]))
-		vec.off += 2
-		raw = vec.raw[vec.off:]
+		var e Extension
+		e.Type = ExtensionType(binary.BigEndian.Uint16(raw[0:2]))
+		eln := binary.BigEndian.Uint16(raw[2:4])
+		if raw, off, err = vec.cut(off, uint32(eln)); err != nil {
+			return off, err
+		}
+		e.Data = raw
+		vec.ext = append(vec.ext, e)
+	}
 
-		if len(raw) < 2 {
-			return ErrTooShort
-		}
-		eln, err := x2u(raw[:2])
-		vec.off += 2
-		raw = vec.raw[vec.off:]
-		if err != nil {
-			return err
-		}
-		if uint64(len(raw)) < eln*2 {
-			return ErrTooShort
-		}
-		ext.Data = raw[:eln*2]
-		vec.off += uint16(eln * 2)
-		raw = vec.raw[vec.off:]
-
-	}
-	return nil
+	return off, nil
 }

@@ -22,7 +22,7 @@ type Interface interface {
 	SessionID() []byte
 	CipherSuites() []CipherSuite
 	CompressionMethod() uint8
-	// todo describe getters
+	Extensions() []Extension
 }
 
 type vector struct {
@@ -73,7 +73,7 @@ func (vec *vector) Parse(raw []byte) (err error) {
 	if off, err = vec.parseCompressionMethod(off); err != nil {
 		return
 	}
-	if err = vec.parseExtensions(); err != nil {
+	if off, err = vec.parseExtensions(off); err != nil {
 		return
 	}
 	return
@@ -121,6 +121,10 @@ func (vec *vector) CipherSuites() []CipherSuite {
 
 func (vec *vector) CompressionMethod() uint8 {
 	return vec.cmps
+}
+
+func (vec *vector) Extensions() []Extension {
+	return vec.ext
 }
 
 func (vec *vector) Reset() {
