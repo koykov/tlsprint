@@ -1,10 +1,12 @@
 package tlsvector
 
 import (
+	"fmt"
 	"io"
 )
 
 type Interface interface {
+	fmt.Stringer
 	Parse(p []byte) error
 	ParseString(s string) error
 	Reset()
@@ -88,6 +90,10 @@ func (vec *vector) Extensions() []Extension {
 	return vec.ext
 }
 
+func (vec *vector) String() string {
+	return ""
+}
+
 func (vec *vector) Reset() {
 	vec.raw = vec.raw[:0]
 
@@ -106,7 +112,7 @@ func (vec *vector) Reset() {
 }
 
 func (vec *vector) cut(off, delta uint32) ([]byte, uint32, error) {
-	if uint32(len(vec.raw)) >= off+delta {
+	if uint32(len(vec.raw)) <= off+delta {
 		return nil, off, io.ErrUnexpectedEOF
 	}
 	return vec.raw[off : off+delta], off + delta, nil
