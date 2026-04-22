@@ -27,7 +27,6 @@ type Interface interface {
 
 type vector struct {
 	raw []byte
-	off uint16
 
 	rtyp RecordType // record type (always handshake)
 	rver uint16     // record version (legacy)
