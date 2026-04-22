@@ -19,12 +19,12 @@ func (vec *vector) parseCipherSuites(off uint32) (_ uint32, err error) {
 	if raw, off, err = vec.cut(off, 2); err != nil {
 		return off, err
 	}
-	n := binary.LittleEndian.Uint16(raw)
-	for i := uint16(0); i < n; i++ {
+	n := binary.BigEndian.Uint16(raw)
+	for i := uint16(0); i < n; i += 2 {
 		if raw, off, err = vec.cut(off, 2); err != nil {
 			return off, err
 		}
-		vec.chps = append(vec.chps, CipherSuite(binary.LittleEndian.Uint16(raw)))
+		vec.chps = append(vec.chps, CipherSuite(binary.BigEndian.Uint16(raw)))
 	}
 	return off, err
 }
