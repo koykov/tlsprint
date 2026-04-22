@@ -1,19 +1,21 @@
 package tlsvector
 
-func (vec *vector) parseCompressionMethod() error {
-	raw := vec.raw[vec.off:]
-	if len(raw) < 2 {
-		return ErrTooShort
+func (vec *vector) parseCompressionMethod(off uint32) (_ uint32, err error) {
+	var raw []byte
+	if raw, off, err = vec.cut(off, 1); err != nil {
+		return off, err
 	}
-	ln, err := x2u(raw[:2])
-	vec.off += 2
-	raw = vec.raw[vec.off:]
-	if err != nil {
-		return err
+	if raw[0] == 0 {
+		return off, err
 	}
-	if uint64(len(raw)) < ln*2 {
-		return ErrTooShort
+	ln := uint32(raw[0])
+	if ln > 1 {
+		err = ErrCompressionMethodTooLong
+		return off, err
 	}
-	vec.cmps = raw[:ln*2]
-	return nil
+	if raw, off, err = vec.cut(off, ln); err != nil {
+		return off, err
+	}
+	vec.cmps = raw[0]
+	return off, err
 }

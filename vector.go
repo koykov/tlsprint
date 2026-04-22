@@ -20,6 +20,8 @@ type Interface interface {
 	LegacyVersion() uint16
 	Random() []byte
 	SessionID() []byte
+	CipherSuites() []CipherSuite
+	CompressionMethod() uint8
 	// todo describe getters
 }
 
@@ -37,7 +39,7 @@ type vector struct {
 	rand []byte        // client random
 	sid  []byte        // session ID
 	chps []CipherSuite // cipher suites
-	cmps []byte        // compression method
+	cmps uint8         // compression method
 	ext  []Extension   // extensions
 }
 
@@ -68,7 +70,7 @@ func (vec *vector) Parse(raw []byte) (err error) {
 	if off, err = vec.parseCipherSuites(off); err != nil {
 		return
 	}
-	if err = vec.parseCompressionMethod(); err != nil {
+	if off, err = vec.parseCompressionMethod(off); err != nil {
 		return
 	}
 	if err = vec.parseExtensions(); err != nil {
@@ -117,6 +119,10 @@ func (vec *vector) CipherSuites() []CipherSuite {
 	return vec.chps
 }
 
+func (vec *vector) CompressionMethod() uint8 {
+	return vec.cmps
+}
+
 func (vec *vector) Reset() {
 	vec.raw = vec.raw[:0]
 
@@ -130,7 +136,7 @@ func (vec *vector) Reset() {
 	vec.rand = vec.rand[:0]
 	vec.sid = vec.sid[:0]
 	vec.chps = vec.chps[:0]
-	vec.cmps = vec.cmps[:0]
+	vec.cmps = 0
 	vec.ext = vec.ext[:0]
 }
 
