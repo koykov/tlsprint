@@ -2,7 +2,6 @@ package tlsvector
 
 import (
 	"encoding/binary"
-	"io"
 	"math"
 )
 
@@ -18,9 +17,9 @@ func (rt RecordType) String() string {
 }
 
 func (vec *vector) parseRecordHeader(off uint32) (_ uint32, err error) {
-	raw := vec.raw[off:]
-	if len(raw) == 0 {
-		return off, io.ErrUnexpectedEOF
+	var raw []byte
+	if raw, off, err = vec.cut(off, 5); err != nil {
+		return off, err
 	}
 	if raw[0] != 0x16 {
 		// Record header not found.
@@ -30,17 +29,10 @@ func (vec *vector) parseRecordHeader(off uint32) (_ uint32, err error) {
 
 	// Byte at position is 0x16 - handshake type.
 	vec.rtyp = RecordTypeHandshake
-	off++
 	// Read protocol version.
-	if raw, off, err = vec.cut(off, 2); err != nil {
-		return off, err
-	}
-	vec.rver = binary.LittleEndian.Uint16(raw)
+	vec.rver = binary.BigEndian.Uint16(raw[1:3])
 	// Read handshake length.
-	if raw, off, err = vec.cut(off, 2); err != nil {
-		return off, err
-	}
-	vec.rlen, err = x2u16(raw)
+	vec.rlen = binary.BigEndian.Uint16(raw[3:5])
 
 	return off, err
 }
