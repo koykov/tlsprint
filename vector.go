@@ -19,7 +19,7 @@ type Interface interface {
 
 	MessageType() MessageType
 	MessageLength() uint32
-	LegacyVersion() uint16
+	LegacyVersion() MessageVersion
 	Random() []byte
 	SessionID() []byte
 	CipherSuites() []CipherSuite
@@ -35,14 +35,14 @@ type vector struct {
 	rver RecordVersion // record version (legacy)
 	rlen uint16        // record length (including handshake header)
 
-	mtyp MessageType   // message type
-	mlen uint32        // message length
-	mver uint16        // TLS version (legacy)
-	rand []byte        // client random
-	sid  []byte        // session ID
-	chps []CipherSuite // cipher suites
-	cmps uint8         // compression method
-	ext  []Extension   // extensions
+	mtyp MessageType    // message type
+	mlen uint32         // message length
+	mver MessageVersion // TLS version (legacy)
+	rand []byte         // client random
+	sid  []byte         // session ID
+	chps []CipherSuite  // cipher suites
+	cmps uint8          // compression method
+	ext  []Extension    // extensions
 }
 
 func New() Interface {
@@ -69,7 +69,7 @@ func (vec *vector) MessageLength() uint32 {
 	return vec.mlen
 }
 
-func (vec *vector) LegacyVersion() uint16 {
+func (vec *vector) LegacyVersion() MessageVersion {
 	return vec.mver
 }
 
@@ -100,6 +100,16 @@ func (vec *vector) String() string {
 	vec.buf = fmt.Appendf(vec.buf, "\tType: %s (%d)\n", vec.rtyp.String(), vec.rtyp)
 	vec.buf = fmt.Appendf(vec.buf, "\tLegacy version: %s (0x%04x)\n", vec.rver.String(), vec.rver.Raw())
 	vec.buf = fmt.Appendf(vec.buf, "\tLength: %d\n", vec.rlen)
+
+	vec.buf = append(vec.buf, "Handshake:\n"...)
+	vec.buf = fmt.Appendf(vec.buf, "\tType: %s (0x%02x)\n", vec.mtyp.String(), vec.mtyp.Raw())
+	vec.buf = fmt.Appendf(vec.buf, "\tLength: %d\n", vec.mlen)
+	vec.buf = fmt.Appendf(vec.buf, "\tLegacy version: %s (0x%04x)\n", vec.mver.String(), vec.mver.Raw())
+	vec.buf = fmt.Appendf(vec.buf, "\tRandom: %x\n", vec.rand)
+	vec.buf = fmt.Appendf(vec.buf, "\tSession ID Length: %x\n", len(vec.sid))
+	if len(vec.sid) > 0 {
+		vec.buf = fmt.Appendf(vec.buf, "\tSession ID: %x\n", vec.sid)
+	}
 
 	return byteconv.B2S(vec.buf)
 }
