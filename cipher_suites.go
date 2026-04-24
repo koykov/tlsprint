@@ -8,6 +8,10 @@ import (
 
 type CipherSuite uint16
 
+func (cs CipherSuite) Raw() uint16 {
+	return uint16(cs)
+}
+
 func (cs CipherSuite) String() string {
 	enc := __cs[cs]
 	lo, hi := uint16(enc>>16), uint16(enc)

@@ -114,9 +114,13 @@ func (vec *vector) String() string {
 		vec.buf = append(vec.buf, "\tSession ID: N/D\n"...)
 	}
 
-	vec.buf = append(vec.buf, "\tCipher Suites:\n"...)
-	for i := 0; i < len(vec.chps); i++ {
-		vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%02X)\n", vec.chps[i].String(), vec.chps[i].Raw())
+	if len(vec.chps) > 0 {
+		vec.buf = append(vec.buf, "\tCipher Suites:\n"...)
+		for i := 0; i < len(vec.chps); i++ {
+			vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%02X)\n", vec.chps[i].String(), vec.chps[i].Raw())
+		}
+	} else {
+		vec.buf = append(vec.buf, "\tCipher Suites: N/D\n"...)
 	}
 
 	vec.buf = fmt.Appendf(vec.buf, "\tCompression Method Length: %d\n", vec.cmpl)
@@ -124,6 +128,16 @@ func (vec *vector) String() string {
 		vec.buf = append(vec.buf, "\tCompression Method: NULL (0)\n"...)
 	} else {
 		vec.buf = fmt.Appendf(vec.buf, "\tCompression Method: %02X\n", vec.cmps)
+	}
+
+	if len(vec.ext) > 0 {
+		vec.buf = append(vec.buf, "\tExtensions:\n"...)
+		for i := 0; i < len(vec.ext); i++ {
+			e := &vec.ext[i]
+			vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%04X)\n", e.Data, uint16(e.Type))
+		}
+	} else {
+		vec.buf = append(vec.buf, "\tExtensions: N/D\n"...)
 	}
 
 	return byteconv.B2S(vec.buf)
