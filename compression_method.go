@@ -13,6 +13,7 @@ func (vec *vector) parseCompressionMethod(off uint32) (_ uint32, err error) {
 		err = ErrCompressionMethodTooLong
 		return off, err
 	}
+	vec.cmpl = uint8(ln)
 	if raw, off, err = vec.cut(off, ln); err != nil {
 		return off, err
 	}

@@ -41,6 +41,7 @@ type vector struct {
 	rand []byte         // client random
 	sid  []byte         // session ID
 	chps []CipherSuite  // cipher suites
+	cmpl uint8          // compression method
 	cmps uint8          // compression method
 	ext  []Extension    // extensions
 }
@@ -98,18 +99,31 @@ func (vec *vector) String() string {
 	vec.buf = append(vec.buf, "Record:\n"...)
 
 	vec.buf = fmt.Appendf(vec.buf, "\tType: %s (%d)\n", vec.rtyp.String(), vec.rtyp)
-	vec.buf = fmt.Appendf(vec.buf, "\tLegacy version: %s (0x%04x)\n", vec.rver.String(), vec.rver.Raw())
+	vec.buf = fmt.Appendf(vec.buf, "\tLegacy version: %s (0x%04X)\n", vec.rver.String(), vec.rver.Raw())
 	vec.buf = fmt.Appendf(vec.buf, "\tLength: %d\n", vec.rlen)
 
 	vec.buf = append(vec.buf, "Handshake:\n"...)
-	vec.buf = fmt.Appendf(vec.buf, "\tType: %s (0x%02x)\n", vec.mtyp.String(), vec.mtyp.Raw())
+	vec.buf = fmt.Appendf(vec.buf, "\tType: %s (0x%02X)\n", vec.mtyp.String(), vec.mtyp.Raw())
 	vec.buf = fmt.Appendf(vec.buf, "\tLength: %d\n", vec.mlen)
-	vec.buf = fmt.Appendf(vec.buf, "\tLegacy version: %s (0x%04x)\n", vec.mver.String(), vec.mver.Raw())
-	vec.buf = fmt.Appendf(vec.buf, "\tRandom: %x\n", vec.rand)
+	vec.buf = fmt.Appendf(vec.buf, "\tLegacy version: %s (0x%04X)\n", vec.mver.String(), vec.mver.Raw())
+	vec.buf = fmt.Appendf(vec.buf, "\tRandom: %X\n", vec.rand)
+	vec.buf = fmt.Appendf(vec.buf, "\tSession ID Length: %d\n", len(vec.sid))
 	if len(vec.sid) > 0 {
-		vec.buf = fmt.Appendf(vec.buf, "\tSession ID: %x\n", vec.sid)
+		vec.buf = fmt.Appendf(vec.buf, "\tSession ID: %X\n", vec.sid)
 	} else {
 		vec.buf = append(vec.buf, "\tSession ID: N/D\n"...)
+	}
+
+	vec.buf = append(vec.buf, "\tCipher Suites:\n"...)
+	for i := 0; i < len(vec.chps); i++ {
+		vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%02X)\n", vec.chps[i].String(), vec.chps[i].Raw())
+	}
+
+	vec.buf = fmt.Appendf(vec.buf, "\tCompression Method Length: %d\n", vec.cmpl)
+	if vec.cmps == 0 {
+		vec.buf = append(vec.buf, "\tCompression Method: NULL (0)\n"...)
+	} else {
+		vec.buf = fmt.Appendf(vec.buf, "\tCompression Method: %02X\n", vec.cmps)
 	}
 
 	return byteconv.B2S(vec.buf)
@@ -129,6 +143,7 @@ func (vec *vector) Reset() {
 	vec.rand = vec.rand[:0]
 	vec.sid = vec.sid[:0]
 	vec.chps = vec.chps[:0]
+	vec.cmpl = 0
 	vec.cmps = 0
 	vec.ext = vec.ext[:0]
 }
