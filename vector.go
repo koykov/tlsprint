@@ -3,6 +3,8 @@ package tlsvector
 import (
 	"fmt"
 	"io"
+
+	"github.com/koykov/byteconv"
 )
 
 type Interface interface {
@@ -12,7 +14,7 @@ type Interface interface {
 	Reset()
 
 	RecordType() RecordType
-	RecordLegacyVersion() uint16
+	RecordLegacyVersion() RecordVersion
 	RecordLength() uint16
 
 	MessageType() MessageType
@@ -27,10 +29,11 @@ type Interface interface {
 
 type vector struct {
 	raw []byte
+	buf []byte
 
-	rtyp RecordType // record type (always handshake)
-	rver uint16     // record version (legacy)
-	rlen uint16     // record length (including handshake header)
+	rtyp RecordType    // record type (always handshake)
+	rver RecordVersion // record version (legacy)
+	rlen uint16        // record length (including handshake header)
 
 	mtyp MessageType   // message type
 	mlen uint32        // message length
@@ -50,7 +53,7 @@ func (vec *vector) RecordType() RecordType {
 	return vec.rtyp
 }
 
-func (vec *vector) RecordLegacyVersion() uint16 {
+func (vec *vector) RecordLegacyVersion() RecordVersion {
 	return vec.rver
 }
 
@@ -91,11 +94,19 @@ func (vec *vector) Extensions() []Extension {
 }
 
 func (vec *vector) String() string {
-	return ""
+	vec.buf = vec.buf[:0]
+	vec.buf = append(vec.buf, "Record:\n"...)
+
+	vec.buf = fmt.Appendf(vec.buf, "\tType: %s (%d)\n", vec.rtyp.String(), vec.rtyp)
+	vec.buf = fmt.Appendf(vec.buf, "\tLegacy version: %s (0x%04x)\n", vec.rver.String(), vec.rver.Raw())
+	vec.buf = fmt.Appendf(vec.buf, "\tLength: %d\n", vec.rlen)
+
+	return byteconv.B2S(vec.buf)
 }
 
 func (vec *vector) Reset() {
 	vec.raw = vec.raw[:0]
+	vec.buf = vec.buf[:0]
 
 	vec.rtyp = RecordTypeUnknown
 	vec.rver = 0
