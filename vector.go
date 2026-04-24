@@ -106,9 +106,10 @@ func (vec *vector) String() string {
 	vec.buf = fmt.Appendf(vec.buf, "\tLength: %d\n", vec.mlen)
 	vec.buf = fmt.Appendf(vec.buf, "\tLegacy version: %s (0x%04x)\n", vec.mver.String(), vec.mver.Raw())
 	vec.buf = fmt.Appendf(vec.buf, "\tRandom: %x\n", vec.rand)
-	vec.buf = fmt.Appendf(vec.buf, "\tSession ID Length: %x\n", len(vec.sid))
 	if len(vec.sid) > 0 {
 		vec.buf = fmt.Appendf(vec.buf, "\tSession ID: %x\n", vec.sid)
+	} else {
+		vec.buf = append(vec.buf, "\tSession ID: N/D\n"...)
 	}
 
 	return byteconv.B2S(vec.buf)
