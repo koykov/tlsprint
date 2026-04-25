@@ -18,9 +18,22 @@ func (et ExtensionType) String() string {
 	return byteconv.B2S(__ext_buf[lo:hi])
 }
 
+type ExtensionDescriptor interface {
+	AppendDescription(dst []byte) []byte
+}
+
 type Extension struct {
 	Type ExtensionType
 	Data []byte
+}
+
+func (e *Extension) AppendDescription(dst []byte) []byte {
+	descrFn, ok := __ext_descr[e.Type]
+	if !ok {
+		dst = append(dst, "N/D"...)
+	}
+	descr := descrFn(e.Data)
+	return descr.AppendDescription(dst)
 }
 
 func (vec *vector) parseExtensions(off uint32) (_ uint32, err error) {
