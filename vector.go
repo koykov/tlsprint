@@ -134,7 +134,7 @@ func (vec *vector) String() string {
 		vec.buf = append(vec.buf, "\tExtensions:\n"...)
 		for i := 0; i < len(vec.ext); i++ {
 			e := &vec.ext[i]
-			vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%04X)\n", e.Data, uint16(e.Type))
+			vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%04X)\n", e.Data, e.Type.Raw())
 		}
 	} else {
 		vec.buf = append(vec.buf, "\tExtensions: N/D\n"...)

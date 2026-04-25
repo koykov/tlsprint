@@ -4,6 +4,14 @@ import "encoding/binary"
 
 type ExtensionType uint16
 
+func (et ExtensionType) Raw() uint16 {
+	return uint16(et)
+}
+
+func (et ExtensionType) String() string {
+	return ""
+}
+
 type Extension struct {
 	Type ExtensionType
 	Data []byte
