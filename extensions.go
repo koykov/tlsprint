@@ -1,6 +1,10 @@
 package tlsvector
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+
+	"github.com/koykov/byteconv"
+)
 
 type ExtensionType uint16
 
@@ -9,7 +13,9 @@ func (et ExtensionType) Raw() uint16 {
 }
 
 func (et ExtensionType) String() string {
-	return ""
+	enc := __ext[et]
+	lo, hi := uint16(enc>>16), uint16(enc)
+	return byteconv.B2S(__ext_buf[lo:hi])
 }
 
 type Extension struct {
