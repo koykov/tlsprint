@@ -49,6 +49,10 @@ func main() {
 		c, err = genExt(resp.Body, dst)
 	}
 
+	if err != nil {
+		log.Fatalf("failed %s generation due to error: %s", unit, err.Error())
+	}
+
 	log.Printf("%d %s writes to %s\n", c, unit, dst)
 }
 
@@ -57,6 +61,7 @@ func genCS(r io.Reader, dst string) (c int, err error) {
 		reBin = regexp.MustCompile(`^0x([0123456789ABCDEF]{2}),0x([0123456789ABCDEF]{2})$`)
 		buf   bytes.Buffer
 		names bytes.Buffer
+		rec   []string
 	)
 
 	names.Grow(4096)
@@ -68,12 +73,13 @@ func genCS(r io.Reader, dst string) (c int, err error) {
 
 	rdr := csv.NewReader(r)
 	for i := 0; ; i++ {
-		rec, err := rdr.Read()
+		rec, err = rdr.Read()
 		if err == io.EOF {
+			err = nil
 			break
 		}
 		if err != nil {
-			log.Fatalln(err)
+			return
 		}
 		if i == 0 {
 			// Skip header line.
@@ -84,9 +90,10 @@ func genCS(r io.Reader, dst string) (c int, err error) {
 			if rec[1] == "Reserved" || rec[1] == "Unassigned" {
 				continue
 			}
-			key, err := strconv.ParseInt(m[1]+m[2], 16, 64)
+			var key int64
+			key, err = strconv.ParseInt(m[1]+m[2], 16, 64)
 			if err != nil {
-				log.Fatalln(err)
+				return
 			}
 			lo := names.Len()
 			names.WriteString(rec[1])
