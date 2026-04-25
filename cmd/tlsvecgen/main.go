@@ -14,13 +14,14 @@ import (
 	"strconv"
 )
 
-var ianaCS, dst string
+var ianaCS, ianaExt, dst string
 
 func init() {
 	flag.StringVar(&ianaCS, "cipher-suites", "", "Full URL to IANA source CSV with supported TLS cipher suites.")
+	flag.StringVar(&ianaExt, "extensions", "", "Full URL to IANA source CSV with supported TLS extensions.")
 	flag.StringVar(&dst, "dst", "", "Path to destination Go file.")
 	flag.Parse()
-	if len(ianaCS) == 0 {
+	if len(ianaCS) == 0 && len(ianaExt) == 0 {
 		log.Fatalln("empty source URL provided")
 	}
 	if len(dst) == 0 {
@@ -36,10 +37,26 @@ func main() {
 	defer func() { _ = resp.Body.Close() }()
 
 	var (
+		unit string
+		c    int
+	)
+	switch {
+	case len(ianaCS) > 0:
+		unit = "cipher suites"
+		c, err = genCS(resp.Body, dst)
+	case len(ianaExt) > 0:
+		unit = "extensions"
+		c, err = genExt(resp.Body, dst)
+	}
+
+	log.Printf("%d %s writes to %s\n", c, unit, dst)
+}
+
+func genCS(r io.Reader, dst string) (c int, err error) {
+	var (
 		reBin = regexp.MustCompile(`^0x([0123456789ABCDEF]{2}),0x([0123456789ABCDEF]{2})$`)
 		buf   bytes.Buffer
 		names bytes.Buffer
-		c     int
 	)
 
 	names.Grow(4096)
@@ -49,7 +66,7 @@ func main() {
 	buf.WriteString("package tlsvector\n")
 	buf.WriteString("var(__cs=map[CipherSuite]uint32{\n")
 
-	rdr := csv.NewReader(resp.Body)
+	rdr := csv.NewReader(r)
 	for i := 0; ; i++ {
 		rec, err := rdr.Read()
 		if err == io.EOF {
@@ -96,10 +113,12 @@ func main() {
 	if fmtSource, err = format.Source(source); err != nil {
 		return
 	}
+	err = os.WriteFile(dst, fmtSource, 0644)
 
-	if err = os.WriteFile(dst, fmtSource, 0644); err != nil {
-		log.Fatalln(err)
-	}
+	return
+}
 
-	log.Printf("%d cipher suites writes to %s\n", c, dst)
+func genExt(r io.Reader, dst string) (c int, err error) {
+	// todo implement me
+	return
 }
