@@ -1,6 +1,9 @@
 package tlsvector
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
 // ExtensionServerName represents extension "server_name".
 type ExtensionServerName struct {
@@ -252,7 +255,7 @@ func (e *ExtensionStatusRequest) ResponderIDListLength() int {
 	return int(e.payload[1])<<8 | int(e.payload[2])
 }
 
-func (e *ExtensionStatusRequest) EachResponderID(fn func(id []byte)) {
+func (e *ExtensionStatusRequest) Each(fn func(id []byte)) {
 	if len(e.payload) < 3 {
 		return
 	}
@@ -286,7 +289,7 @@ func (e *ExtensionStatusRequest) AppendDescription(dst []byte) []byte {
 	dst = append(dst, " responder_ids ["...)
 	dst = strconv.AppendInt(dst, int64(e.ResponderIDListLength()), 10)
 	dst = append(dst, "] "...)
-	e.EachResponderID(func(id []byte) {
+	e.Each(func(id []byte) {
 		dst = append(dst, id...)
 		dst = append(dst, ' ')
 	})
@@ -519,7 +522,7 @@ func (e *ExtensionSupportedGroups) Length() int {
 	return int(e.payload[0])<<8 | int(e.payload[1])/2
 }
 
-func (e *ExtensionSupportedGroups) Each(fn func(group uint16)) {
+func (e *ExtensionSupportedGroups) Each(fn func(group EllipticCurve)) {
 	if len(e.payload) < 2 {
 		return
 	}
@@ -532,7 +535,7 @@ func (e *ExtensionSupportedGroups) Each(fn func(group uint16)) {
 			break
 		}
 		group := uint16(e.payload[2+i])<<8 | uint16(e.payload[2+i+1])
-		fn(group)
+		fn(EllipticCurve(group))
 	}
 }
 
@@ -540,9 +543,8 @@ func (e *ExtensionSupportedGroups) AppendDescription(dst []byte) []byte {
 	dst = append(dst, "supported_groups ["...)
 	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
 	dst = append(dst, " groups] "...)
-	e.Each(func(group uint16) {
-		dst = strconv.AppendInt(dst, int64(group), 10)
-		dst = append(dst, ' ')
+	e.Each(func(group EllipticCurve) {
+		dst = fmt.Appendf(dst, "%s (0x%04x) ", group.String(), group.Raw())
 	})
 	return dst
 }
@@ -2455,6 +2457,6 @@ func (e *ExtensionRenegotiationInfo) VerifiedData() []byte {
 
 func (e *ExtensionRenegotiationInfo) AppendDescription(dst []byte) []byte {
 	dst = append(dst, "renegotiation_info verified_data="...)
-	dst = append(dst, e.VerifiedData()...)
+	dst = fmt.Appendf(dst, "0x%02x", e.VerifiedData())
 	return dst
 }
