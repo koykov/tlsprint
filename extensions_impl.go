@@ -661,7 +661,7 @@ func (e *ExtensionSignatureAlgorithms) Length() int {
 	return int(e.payload[0])<<8 | int(e.payload[1])/2
 }
 
-func (e *ExtensionSignatureAlgorithms) Each(fn func(hash, signature byte)) {
+func (e *ExtensionSignatureAlgorithms) Each(fn func(hash byte, sa SignatureAlgorithm)) {
 	if len(e.payload) < 2 {
 		return
 	}
@@ -675,7 +675,7 @@ func (e *ExtensionSignatureAlgorithms) Each(fn func(hash, signature byte)) {
 		}
 		hash := e.payload[2+i]
 		signature := e.payload[2+i+1]
-		fn(hash, signature)
+		fn(hash, SignatureAlgorithm(signature))
 	}
 }
 
@@ -683,11 +683,8 @@ func (e *ExtensionSignatureAlgorithms) AppendDescription(dst []byte) []byte {
 	dst = append(dst, "signature_algorithms ["...)
 	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
 	dst = append(dst, " algos] "...)
-	e.Each(func(hash, signature byte) {
-		dst = strconv.AppendInt(dst, int64(hash), 10)
-		dst = append(dst, '/')
-		dst = strconv.AppendInt(dst, int64(signature), 10)
-		dst = append(dst, ' ')
+	e.Each(func(hash byte, sa SignatureAlgorithm) {
+		dst = fmt.Appendf(dst, "%s (0x%02x) ", sa.String(), sa.Raw())
 	})
 	return dst
 }

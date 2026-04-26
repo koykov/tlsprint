@@ -6,15 +6,16 @@ import (
 	"net/http"
 )
 
-var ianaCS, ianaExt, ianaEC, dst string
+var ianaCS, ianaExt, ianaEC, ianaSA, dst string
 
 func init() {
 	flag.StringVar(&ianaCS, "cipher-suites", "", "Full URL to IANA source CSV with supported TLS cipher suites.")
 	flag.StringVar(&ianaExt, "extensions", "", "Full URL to IANA source CSV with supported TLS extensions.")
 	flag.StringVar(&ianaEC, "elliptic-curves", "", "Full URL to IANA source CSV with supported elliptic curves.")
+	flag.StringVar(&ianaSA, "signature-algorithms", "", "Full URL to IANA source CSV with supported signature algorithms.")
 	flag.StringVar(&dst, "dst", "", "Path to destination Go file.")
 	flag.Parse()
-	if len(ianaCS) == 0 && len(ianaExt) == 0 && len(ianaEC) == 0 {
+	if len(ianaCS) == 0 && len(ianaExt) == 0 && len(ianaEC) == 0 && len(ianaSA) == 0 {
 		log.Fatalln("empty source URL provided")
 	}
 	if len(dst) == 0 {
@@ -31,6 +32,8 @@ func main() {
 		ianaURL = ianaExt
 	case len(ianaEC) > 0:
 		ianaURL = ianaEC
+	case len(ianaSA) > 0:
+		ianaURL = ianaSA
 	}
 
 	resp, err := http.Get(ianaURL)
@@ -53,6 +56,9 @@ func main() {
 	case len(ianaEC) > 0:
 		unit = "elliptic curves"
 		c, err = genEC(resp.Body, dst)
+	case len(ianaSA) > 0:
+		unit = "signature algorithms"
+		c, err = genSA(resp.Body, dst)
 	}
 
 	if err != nil {
