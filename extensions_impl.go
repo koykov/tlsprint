@@ -959,7 +959,7 @@ func (e *ExtensionClientCertificateType) Length() int {
 	return int(e.payload[0])
 }
 
-func (e *ExtensionClientCertificateType) Each(fn func(certType byte)) {
+func (e *ExtensionClientCertificateType) Each(fn func(certType ClientCertificateType)) {
 	if len(e.payload) < 1 {
 		return
 	}
@@ -968,7 +968,7 @@ func (e *ExtensionClientCertificateType) Each(fn func(certType byte)) {
 		return
 	}
 	for i := 0; i < count; i++ {
-		fn(e.payload[1+i])
+		fn(ClientCertificateType(e.payload[1+i]))
 	}
 }
 
@@ -976,9 +976,8 @@ func (e *ExtensionClientCertificateType) AppendDescription(dst []byte) []byte {
 	dst = append(dst, "client_certificate_type ["...)
 	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
 	dst = append(dst, " types] "...)
-	e.Each(func(certType byte) {
-		dst = strconv.AppendInt(dst, int64(certType), 10)
-		dst = append(dst, ' ')
+	e.Each(func(certType ClientCertificateType) {
+		dst = fmt.Appendf(dst, "%s (0x%02x) ", certType.String(), certType.Raw())
 	})
 	return dst
 }
