@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-var ianaCS, ianaExt, ianaEC, ianaSA, ianaCCT, dst string
+var ianaCS, ianaExt, ianaEC, ianaSA, ianaCCT, ianaECPF, dst string
 
 func init() {
 	flag.StringVar(&ianaCS, "cipher-suites", "", "Full URL to IANA source CSV with supported TLS cipher suites.")
@@ -14,9 +14,10 @@ func init() {
 	flag.StringVar(&ianaEC, "elliptic-curves", "", "Full URL to IANA source CSV with supported elliptic curves.")
 	flag.StringVar(&ianaSA, "signature-algorithms", "", "Full URL to IANA source CSV with supported signature algorithms.")
 	flag.StringVar(&ianaCCT, "client-certificate-types", "", "Full URL to IANA source CSV with supported client certificate types.")
+	flag.StringVar(&ianaECPF, "ec-point-formats", "", "Full URL to IANA source CSV with supported EC Point Formats.")
 	flag.StringVar(&dst, "dst", "", "Path to destination Go file.")
 	flag.Parse()
-	if len(ianaCS) == 0 && len(ianaExt) == 0 && len(ianaEC) == 0 && len(ianaSA) == 0 && len(ianaCCT) == 0 {
+	if len(ianaCS) == 0 && len(ianaExt) == 0 && len(ianaEC) == 0 && len(ianaSA) == 0 && len(ianaCCT) == 0 && len(ianaECPF) == 0 {
 		log.Fatalln("empty source URL provided")
 	}
 	if len(dst) == 0 {
@@ -37,6 +38,8 @@ func main() {
 		ianaURL = ianaSA
 	case len(ianaCCT) > 0:
 		ianaURL = ianaCCT
+	case len(ianaECPF) > 0:
+		ianaURL = ianaECPF
 	}
 
 	resp, err := http.Get(ianaURL)
@@ -65,6 +68,9 @@ func main() {
 	case len(ianaCCT) > 0:
 		unit = "client certificate types"
 		c, err = genCCT(resp.Body, dst)
+	case len(ianaECPF) > 0:
+		unit = "client certificate types"
+		c, err = genECPF(resp.Body, dst)
 	}
 
 	if err != nil {

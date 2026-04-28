@@ -567,7 +567,7 @@ func (e *ExtensionECPointFormats) Length() int {
 	return int(e.payload[0])
 }
 
-func (e *ExtensionECPointFormats) Each(fn func(format byte)) {
+func (e *ExtensionECPointFormats) Each(fn func(format ECPointFormats)) {
 	if len(e.payload) < 1 {
 		return
 	}
@@ -576,7 +576,7 @@ func (e *ExtensionECPointFormats) Each(fn func(format byte)) {
 		return
 	}
 	for i := 0; i < count; i++ {
-		fn(e.payload[1+i])
+		fn(ECPointFormats(e.payload[1+i]))
 	}
 }
 
@@ -584,9 +584,8 @@ func (e *ExtensionECPointFormats) AppendDescription(dst []byte) []byte {
 	dst = append(dst, "ec_point_formats ["...)
 	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
 	dst = append(dst, " formats] "...)
-	e.Each(func(format byte) {
-		dst = strconv.AppendInt(dst, int64(format), 10)
-		dst = append(dst, ' ')
+	e.Each(func(format ECPointFormats) {
+		dst = fmt.Appendf(dst, "%s (0x%02x) ", format.String(), format.Raw())
 	})
 	return dst
 }
