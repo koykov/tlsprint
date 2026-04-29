@@ -9,7 +9,7 @@ func (ecpf ECPointFormats) Raw() uint8 {
 }
 
 func (ecpf ECPointFormats) String() string {
-	enc := __cct[ecpf]
+	enc := __ecpf[ecpf]
 	lo, hi := uint16(enc>>16), uint16(enc)
-	return byteconv.B2S(__cct_buf[lo:hi])
+	return byteconv.B2S(__ecpf_buf[lo:hi])
 }
