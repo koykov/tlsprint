@@ -2076,7 +2076,7 @@ func (e *ExtensionKeyShare) AppendDescription(dst []byte) []byte {
 		dst = append(dst, "group="...)
 		dst = strconv.AppendInt(dst, int64(group), 10)
 		dst = append(dst, " key="...)
-		dst = append(dst, keyExchange...)
+		dst = fmt.Appendf(dst, "%X", keyExchange)
 		dst = append(dst, ' ')
 	})
 	return dst
