@@ -45,16 +45,14 @@ func (e *ExtensionServerName) Each(fn func(nameType byte, name []byte)) {
 	}
 }
 
-func (e *ExtensionServerName) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "server_name ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " entries] "...)
+func (e *ExtensionServerName) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(nameType byte, name []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, "type="...)
 		dst = strconv.AppendInt(dst, int64(nameType), 10)
 		dst = append(dst, " name="...)
 		dst = append(dst, name...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -77,9 +75,11 @@ func (e *ExtensionMaxFragmentLength) Value() byte {
 	return e.payload[0]
 }
 
-func (e *ExtensionMaxFragmentLength) AppendDescription(dst []byte) []byte {
+func (e *ExtensionMaxFragmentLength) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
 	dst = append(dst, "max_fragment_length "...)
 	dst = strconv.AppendInt(dst, int64(e.Value()), 10)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -121,13 +121,11 @@ func (e *ExtensionClientCertificateURL) Each(fn func(url []byte)) {
 	}
 }
 
-func (e *ExtensionClientCertificateURL) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "client_certificate_url ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " urls] "...)
+func (e *ExtensionClientCertificateURL) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(url []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, url...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -184,16 +182,14 @@ func (e *ExtensionTrustedCAKeys) Each(fn func(caID []byte, dnList []byte)) {
 	}
 }
 
-func (e *ExtensionTrustedCAKeys) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "trusted_ca_keys ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " entries] "...)
+func (e *ExtensionTrustedCAKeys) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(caID []byte, dnList []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, "ca_id="...)
 		dst = append(dst, caID...)
 		dst = append(dst, " dn_list="...)
 		dst = append(dst, dnList...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -219,13 +215,11 @@ func (e *ExtensionTruncatedHMAC) Each(fn func(hmacLen byte)) {
 	}
 }
 
-func (e *ExtensionTruncatedHMAC) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "truncated_hmac ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " lengths] "...)
+func (e *ExtensionTruncatedHMAC) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(hmacLen byte) {
+		dst = append(dst, pad...)
 		dst = strconv.AppendInt(dst, int64(hmacLen), 10)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -283,18 +277,25 @@ func (e *ExtensionStatusRequest) RequestExtensionLength() int {
 	return int(e.payload[offset])<<8 | int(e.payload[offset+1])
 }
 
-func (e *ExtensionStatusRequest) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "status_request type="...)
+func (e *ExtensionStatusRequest) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
+	dst = append(dst, "type="...)
 	dst = strconv.AppendInt(dst, int64(e.StatusType()), 10)
-	dst = append(dst, " responder_ids ["...)
+	dst = append(dst, '\n')
+	dst = append(dst, pad...)
+	dst = append(dst, "responder_ids ["...)
 	dst = strconv.AppendInt(dst, int64(e.ResponderIDListLength()), 10)
-	dst = append(dst, "] "...)
+	dst = append(dst, "]\n"...)
 	e.Each(func(id []byte) {
+		dst = append(dst, pad...)
+		dst = append(dst, '\t')
 		dst = append(dst, id...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
-	dst = append(dst, " request_ext_len="...)
+	dst = append(dst, pad...)
+	dst = append(dst, "request_ext_len="...)
 	dst = strconv.AppendInt(dst, int64(e.RequestExtensionLength()), 10)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -344,16 +345,14 @@ func (e *ExtensionUserMapping) Each(fn func(mappingType byte, data []byte)) {
 	}
 }
 
-func (e *ExtensionUserMapping) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "user_mapping ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " entries] "...)
+func (e *ExtensionUserMapping) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(mappingType byte, data []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, "type="...)
 		dst = strconv.AppendInt(dst, int64(mappingType), 10)
 		dst = append(dst, " data="...)
 		dst = append(dst, data...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -399,13 +398,11 @@ func (e *ExtensionClientAuthz) Each(fn func(authzData []byte)) {
 	}
 }
 
-func (e *ExtensionClientAuthz) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "client_authz ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " entries] "...)
+func (e *ExtensionClientAuthz) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(authzData []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, authzData...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -451,13 +448,11 @@ func (e *ExtensionServerAuthz) Each(fn func(authzData []byte)) {
 	}
 }
 
-func (e *ExtensionServerAuthz) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "server_authz ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " entries] "...)
+func (e *ExtensionServerAuthz) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(authzData []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, authzData...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -493,13 +488,11 @@ func (e *ExtensionCertType) Each(fn func(certType byte)) {
 	}
 }
 
-func (e *ExtensionCertType) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "cert_type ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " types] "...)
+func (e *ExtensionCertType) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(certType byte) {
+		dst = append(dst, pad...)
 		dst = strconv.AppendInt(dst, int64(certType), 10)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -539,12 +532,11 @@ func (e *ExtensionSupportedGroups) Each(fn func(group EllipticCurve)) {
 	}
 }
 
-func (e *ExtensionSupportedGroups) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "supported_groups ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " groups] "...)
+func (e *ExtensionSupportedGroups) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(group EllipticCurve) {
+		dst = append(dst, pad...)
 		dst = fmt.Appendf(dst, "%s (0x%04x) ", group.String(), group.Raw())
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -580,12 +572,11 @@ func (e *ExtensionECPointFormats) Each(fn func(format ECPointFormats)) {
 	}
 }
 
-func (e *ExtensionECPointFormats) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "ec_point_formats ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " formats] "...)
+func (e *ExtensionECPointFormats) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(format ECPointFormats) {
+		dst = append(dst, pad...)
 		dst = fmt.Appendf(dst, "%s (0x%02x) ", format.String(), format.Raw())
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -631,13 +622,11 @@ func (e *ExtensionSRP) Each(fn func(identity []byte)) {
 	}
 }
 
-func (e *ExtensionSRP) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "srp ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " identities] "...)
+func (e *ExtensionSRP) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(identity []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, identity...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -678,12 +667,11 @@ func (e *ExtensionSignatureAlgorithms) Each(fn func(hash byte, sa SignatureAlgor
 	}
 }
 
-func (e *ExtensionSignatureAlgorithms) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "signature_algorithms ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " algos] "...)
+func (e *ExtensionSignatureAlgorithms) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(hash byte, sa SignatureAlgorithm) {
+		dst = append(dst, pad...)
 		dst = fmt.Appendf(dst, "%s (0x%02x) ", sa.String(), sa.Raw())
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -739,15 +727,14 @@ func (e *ExtensionUseSRTP) MKI() []byte {
 	return e.payload[mkiOffset+1 : mkiOffset+1+mkiLen]
 }
 
-func (e *ExtensionUseSRTP) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "use_srtp ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " profiles] mki="...)
+func (e *ExtensionUseSRTP) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
 	dst = append(dst, e.MKI()...)
-	dst = append(dst, ' ')
+	dst = append(dst, '\n')
 	e.Each(func(profile uint16) {
+		dst = append(dst, pad...)
 		dst = strconv.AppendInt(dst, int64(profile), 10)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -770,9 +757,10 @@ func (e *ExtensionHeartbeat) Mode() byte {
 	return e.payload[0]
 }
 
-func (e *ExtensionHeartbeat) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "heartbeat mode="...)
+func (e *ExtensionHeartbeat) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
 	dst = strconv.AppendInt(dst, int64(e.Mode()), 10)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -817,13 +805,11 @@ func (e *ExtensionApplicationLayerProtocolNegotiation) Each(fn func(protocol []b
 	}
 }
 
-func (e *ExtensionApplicationLayerProtocolNegotiation) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "application_layer_protocol_negotiation ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " protocols] "...)
+func (e *ExtensionApplicationLayerProtocolNegotiation) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(protocol []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, protocol...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -874,16 +860,14 @@ func (e *ExtensionStatusRequestV2) Each(fn func(statusType byte, requestData []b
 	}
 }
 
-func (e *ExtensionStatusRequestV2) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "status_request_v2 ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " requests] "...)
+func (e *ExtensionStatusRequestV2) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(statusType byte, requestData []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, "type="...)
 		dst = strconv.AppendInt(dst, int64(statusType), 10)
 		dst = append(dst, " data="...)
 		dst = append(dst, requestData...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -929,13 +913,11 @@ func (e *ExtensionSignedCertificateTimestamp) Each(fn func(timestamp []byte)) {
 	}
 }
 
-func (e *ExtensionSignedCertificateTimestamp) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "signed_certificate_timestamp ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " timestamps] "...)
+func (e *ExtensionSignedCertificateTimestamp) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(timestamp []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, timestamp...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -971,12 +953,11 @@ func (e *ExtensionClientCertificateType) Each(fn func(certType ClientCertificate
 	}
 }
 
-func (e *ExtensionClientCertificateType) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "client_certificate_type ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " types] "...)
+func (e *ExtensionClientCertificateType) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(certType ClientCertificateType) {
+		dst = append(dst, pad...)
 		dst = fmt.Appendf(dst, "%s (0x%02x) ", certType.String(), certType.Raw())
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -1012,12 +993,11 @@ func (e *ExtensionServerCertificateType) Each(fn func(certType ClientCertificate
 	}
 }
 
-func (e *ExtensionServerCertificateType) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "server_certificate_type ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " types] "...)
+func (e *ExtensionServerCertificateType) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(certType ClientCertificateType) {
+		dst = append(dst, pad...)
 		dst = fmt.Appendf(dst, "%s (0x%02x) ", certType.String(), certType.Raw())
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -1043,9 +1023,10 @@ func (e *ExtensionPadding) Each(fn func(paddingByte byte)) {
 	}
 }
 
-func (e *ExtensionPadding) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "padding len="...)
+func (e *ExtensionPadding) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
 	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -1060,8 +1041,8 @@ func NewExtensionEncryptThenMAC(payload []byte) *ExtensionEncryptThenMAC {
 	return &ExtensionEncryptThenMAC{payload: payload}
 }
 
-func (e *ExtensionEncryptThenMAC) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "encrypt_then_mac"...)
+func (e *ExtensionEncryptThenMAC) AppendDescription(dst []byte, pad string) []byte {
+	_ = pad
 	return dst
 }
 
@@ -1076,8 +1057,8 @@ func NewExtensionExtendedMainSecret(payload []byte) *ExtensionExtendedMainSecret
 	return &ExtensionExtendedMainSecret{payload: payload}
 }
 
-func (e *ExtensionExtendedMainSecret) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "extended_main_secret"...)
+func (e *ExtensionExtendedMainSecret) AppendDescription(dst []byte, pad string) []byte {
+	_ = pad
 	return dst
 }
 
@@ -1119,15 +1100,16 @@ func (e *ExtensionTokenBinding) Each(fn func(keyParams byte)) {
 	}
 }
 
-func (e *ExtensionTokenBinding) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "token_binding version="...)
+func (e *ExtensionTokenBinding) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
+	dst = append(dst, "version="...)
 	dst = strconv.AppendInt(dst, int64(e.Version()), 10)
-	dst = append(dst, " ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " params] "...)
+	dst = append(dst, '\n')
 	e.Each(func(keyParams byte) {
+		dst = append(dst, pad...)
+		dst = append(dst, '\t')
 		dst = strconv.AppendInt(dst, int64(keyParams), 10)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -1178,16 +1160,14 @@ func (e *ExtensionCachedInfo) Each(fn func(cachedType byte, data []byte)) {
 	}
 }
 
-func (e *ExtensionCachedInfo) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "cached_info ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " entries] "...)
+func (e *ExtensionCachedInfo) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(cachedType byte, data []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, "type="...)
 		dst = strconv.AppendInt(dst, int64(cachedType), 10)
 		dst = append(dst, " data="...)
 		dst = append(dst, data...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -1226,7 +1206,7 @@ func (e *ExtensionTLSLTS) Each(fn func(data []byte)) {
 	}
 }
 
-func (e *ExtensionTLSLTS) AppendDescription(dst []byte) []byte {
+func (e *ExtensionTLSLTS) AppendDescription(dst []byte, pad string) []byte {
 	dst = append(dst, "tls_lts ["...)
 	dst = strconv.AppendInt(dst, int64(len(e.payload)), 10)
 	dst = append(dst, " bytes] "...)
@@ -1269,13 +1249,11 @@ func (e *ExtensionCompressCertificate) Each(fn func(algorithm uint16)) {
 	}
 }
 
-func (e *ExtensionCompressCertificate) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "compress_certificate ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " algorithms] "...)
+func (e *ExtensionCompressCertificate) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(algorithm uint16) {
+		dst = append(dst, pad...)
 		dst = strconv.AppendInt(dst, int64(algorithm), 10)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -1298,9 +1276,10 @@ func (e *ExtensionRecordSizeLimit) Limit() uint16 {
 	return uint16(e.payload[0])<<8 | uint16(e.payload[1])
 }
 
-func (e *ExtensionRecordSizeLimit) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "record_size_limit "...)
+func (e *ExtensionRecordSizeLimit) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
 	dst = strconv.AppendInt(dst, int64(e.Limit()), 10)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -1319,9 +1298,10 @@ func (e *ExtensionPWDProtect) Length() int {
 	return len(e.payload)
 }
 
-func (e *ExtensionPWDProtect) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "pwd_protect len="...)
+func (e *ExtensionPWDProtect) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
 	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -1340,9 +1320,10 @@ func (e *ExtensionPWDClear) Length() int {
 	return len(e.payload)
 }
 
-func (e *ExtensionPWDClear) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "pwd_clear len="...)
+func (e *ExtensionPWDClear) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
 	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -1361,9 +1342,10 @@ func (e *ExtensionPasswordSalt) Length() int {
 	return len(e.payload)
 }
 
-func (e *ExtensionPasswordSalt) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "password_salt len="...)
+func (e *ExtensionPasswordSalt) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
 	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -1418,16 +1400,14 @@ func (e *ExtensionTicketPinning) Each(fn func(pinKey []byte, pin []byte)) {
 	}
 }
 
-func (e *ExtensionTicketPinning) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "ticket_pinning ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " entries] "...)
+func (e *ExtensionTicketPinning) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(pinKey []byte, pin []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, "key="...)
 		dst = append(dst, pinKey...)
 		dst = append(dst, " pin="...)
 		dst = append(dst, pin...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -1443,8 +1423,8 @@ func NewExtensionTLSCertWithExternPSK(payload []byte) *ExtensionTLSCertWithExter
 	return &ExtensionTLSCertWithExternPSK{payload: payload}
 }
 
-func (e *ExtensionTLSCertWithExternPSK) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "tls_cert_with_extern_psk"...)
+func (e *ExtensionTLSCertWithExternPSK) AppendDescription(dst []byte, pad string) []byte {
+	_ = pad
 	return dst
 }
 
@@ -1495,17 +1475,15 @@ func (e *ExtensionDelegatedCredential) Each(fn func(hash, signature byte, public
 	}
 }
 
-func (e *ExtensionDelegatedCredential) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "delegated_credential ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " entries] "...)
+func (e *ExtensionDelegatedCredential) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(hash, signature byte, publicKey []byte) {
+		dst = append(dst, pad...)
 		dst = strconv.AppendInt(dst, int64(hash), 10)
 		dst = append(dst, '/')
 		dst = strconv.AppendInt(dst, int64(signature), 10)
 		dst = append(dst, " key="...)
 		dst = append(dst, publicKey...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -1525,9 +1503,10 @@ func (e *ExtensionSessionTicket) Ticket() []byte {
 	return e.payload
 }
 
-func (e *ExtensionSessionTicket) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "session_ticket len="...)
+func (e *ExtensionSessionTicket) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
 	dst = strconv.AppendInt(dst, int64(len(e.Ticket())), 10)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -1546,9 +1525,10 @@ func (e *ExtensionTLMSP) Length() int {
 	return len(e.payload)
 }
 
-func (e *ExtensionTLMSP) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "TLMSP len="...)
-	dst = strconv.AppendInt(dst, int64(len(e.payload)), 10)
+func (e *ExtensionTLMSP) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
+	dst = fmt.Appendf(dst, "%X", e.payload)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -1567,9 +1547,10 @@ func (e *ExtensionTLMSPProxying) Length() int {
 	return len(e.payload)
 }
 
-func (e *ExtensionTLMSPProxying) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "TLMSP_proxying len="...)
-	dst = strconv.AppendInt(dst, int64(len(e.payload)), 10)
+func (e *ExtensionTLMSPProxying) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
+	dst = fmt.Appendf(dst, "%X", e.payload)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -1588,9 +1569,10 @@ func (e *ExtensionTLMSPDelegate) Length() int {
 	return len(e.payload)
 }
 
-func (e *ExtensionTLMSPDelegate) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "TLMSP_delegate len="...)
-	dst = strconv.AppendInt(dst, int64(len(e.payload)), 10)
+func (e *ExtensionTLMSPDelegate) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
+	dst = fmt.Appendf(dst, "%X", e.payload)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -1629,13 +1611,11 @@ func (e *ExtensionSupportedEKTCiphers) Each(fn func(cipher uint16)) {
 	}
 }
 
-func (e *ExtensionSupportedEKTCiphers) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "supported_ekt_ciphers ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " ciphers] "...)
+func (e *ExtensionSupportedEKTCiphers) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(cipher uint16) {
-		dst = strconv.AppendInt(dst, int64(cipher), 10)
-		dst = append(dst, ' ')
+		dst = append(dst, pad...)
+		dst = fmt.Appendf(dst, "0x%04x", cipher)
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -1693,16 +1673,14 @@ func (e *ExtensionPreSharedKey) Each(fn func(identity []byte, obfuscatedTicketAg
 	}
 }
 
-func (e *ExtensionPreSharedKey) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "pre_shared_key ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " identities] "...)
+func (e *ExtensionPreSharedKey) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(identity []byte, obfuscatedTicketAge uint32) {
+		dst = append(dst, pad...)
 		dst = append(dst, "id="...)
 		dst = append(dst, identity...)
 		dst = append(dst, " age="...)
 		dst = strconv.AppendInt(dst, int64(obfuscatedTicketAge), 10)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -1725,9 +1703,11 @@ func (e *ExtensionEarlyData) MaxEarlyDataSize() uint32 {
 	return uint32(e.payload[0])<<24 | uint32(e.payload[1])<<16 | uint32(e.payload[2])<<8 | uint32(e.payload[3])
 }
 
-func (e *ExtensionEarlyData) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "early_data max_size="...)
+func (e *ExtensionEarlyData) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
+	dst = append(dst, "max_size="...)
 	dst = strconv.AppendInt(dst, int64(e.MaxEarlyDataSize()), 10)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -1766,13 +1746,11 @@ func (e *ExtensionSupportedVersions) Each(fn func(version uint16)) {
 	}
 }
 
-func (e *ExtensionSupportedVersions) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "supported_versions ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " versions] "...)
+func (e *ExtensionSupportedVersions) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(version uint16) {
-		dst = strconv.AppendInt(dst, int64(version), 10)
-		dst = append(dst, ' ')
+		dst = append(dst, pad...)
+		dst = fmt.Appendf(dst, "0x%04x", version)
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -1792,9 +1770,10 @@ func (e *ExtensionCookie) Cookie() []byte {
 	return e.payload
 }
 
-func (e *ExtensionCookie) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "cookie len="...)
-	dst = strconv.AppendInt(dst, int64(len(e.Cookie())), 10)
+func (e *ExtensionCookie) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
+	dst = append(dst, e.Cookie()...)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -1829,13 +1808,11 @@ func (e *ExtensionPSKKeyExchangeModes) Each(fn func(mode byte)) {
 	}
 }
 
-func (e *ExtensionPSKKeyExchangeModes) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "psk_key_exchange_modes ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " modes] "...)
+func (e *ExtensionPSKKeyExchangeModes) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(mode byte) {
-		dst = strconv.AppendInt(dst, int64(mode), 10)
-		dst = append(dst, ' ')
+		dst = append(dst, pad...)
+		dst = fmt.Appendf(dst, "0x%02x", mode)
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -1881,13 +1858,11 @@ func (e *ExtensionCertificateAuthorities) Each(fn func(ca []byte)) {
 	}
 }
 
-func (e *ExtensionCertificateAuthorities) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "certificate_authorities ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " CAs] "...)
+func (e *ExtensionCertificateAuthorities) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(ca []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, ca...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -1943,16 +1918,14 @@ func (e *ExtensionOIDFilters) Each(fn func(oid []byte, filter []byte)) {
 	}
 }
 
-func (e *ExtensionOIDFilters) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "oid_filters ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " filters] "...)
+func (e *ExtensionOIDFilters) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(oid []byte, filter []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, "oid="...)
 		dst = append(dst, oid...)
 		dst = append(dst, " filter="...)
 		dst = append(dst, filter...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -1973,8 +1946,8 @@ type ExtensionSignatureAlgorithmsCert struct {
 	payload []byte
 }
 
-func (e *ExtensionPostHandshakeAuth) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "post_handshake_auth"...)
+func (e *ExtensionPostHandshakeAuth) AppendDescription(dst []byte, pad string) []byte {
+	_ = pad
 	return dst
 }
 
@@ -2009,15 +1982,13 @@ func (e *ExtensionSignatureAlgorithmsCert) Each(fn func(hash, signature byte)) {
 	}
 }
 
-func (e *ExtensionSignatureAlgorithmsCert) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "signature_algorithms_cert ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " algos] "...)
+func (e *ExtensionSignatureAlgorithmsCert) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(hash, signature byte) {
+		dst = append(dst, pad...)
 		dst = strconv.AppendInt(dst, int64(hash), 10)
 		dst = append(dst, '/')
 		dst = strconv.AppendInt(dst, int64(signature), 10)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -2068,16 +2039,14 @@ func (e *ExtensionKeyShare) Each(fn func(group uint16, keyExchange []byte)) {
 	}
 }
 
-func (e *ExtensionKeyShare) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "key_share ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " shares] "...)
+func (e *ExtensionKeyShare) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(group uint16, keyExchange []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, "group="...)
 		dst = strconv.AppendInt(dst, int64(group), 10)
 		dst = append(dst, " key="...)
 		dst = fmt.Appendf(dst, "%X", keyExchange)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -2097,9 +2066,9 @@ func (e *ExtensionTransparencyInfo) Length() int {
 	return len(e.payload)
 }
 
-func (e *ExtensionTransparencyInfo) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "transparency_info len="...)
-	dst = strconv.AppendInt(dst, int64(len(e.payload)), 10)
+func (e *ExtensionTransparencyInfo) AppendDescription(dst []byte, pad string) []byte {
+	dst = fmt.Appendf(dst, "%X", e.payload)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -2118,9 +2087,11 @@ func (e *ExtensionConnectionID) CID() []byte {
 	return e.payload
 }
 
-func (e *ExtensionConnectionID) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "connection_id cid="...)
+func (e *ExtensionConnectionID) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
+	dst = append(dst, "cid="...)
 	dst = append(dst, e.CID()...)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -2139,9 +2110,11 @@ func (e *ExtensionExternalIDHash) Hash() []byte {
 	return e.payload
 }
 
-func (e *ExtensionExternalIDHash) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "external_id_hash hash="...)
+func (e *ExtensionExternalIDHash) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
+	dst = append(dst, "hash="...)
 	dst = append(dst, e.Hash()...)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -2160,9 +2133,11 @@ func (e *ExtensionExternalSessionID) ID() []byte {
 	return e.payload
 }
 
-func (e *ExtensionExternalSessionID) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "external_session_id id="...)
+func (e *ExtensionExternalSessionID) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
+	dst = append(dst, "id="...)
 	dst = append(dst, e.ID()...)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -2181,9 +2156,10 @@ func (e *ExtensionQUICTransportParameters) Parameters() []byte {
 	return e.payload
 }
 
-func (e *ExtensionQUICTransportParameters) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "quic_transport_parameters len="...)
-	dst = strconv.AppendInt(dst, int64(len(e.Parameters())), 10)
+func (e *ExtensionQUICTransportParameters) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
+	dst = append(dst, e.payload...)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -2198,8 +2174,8 @@ func NewExtensionTicketRequest(payload []byte) *ExtensionTicketRequest {
 	return &ExtensionTicketRequest{payload: payload}
 }
 
-func (e *ExtensionTicketRequest) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "ticket_request"...)
+func (e *ExtensionTicketRequest) AppendDescription(dst []byte, pad string) []byte {
+	_ = pad
 	return dst
 }
 
@@ -2244,13 +2220,11 @@ func (e *ExtensionDNSSECChain) Each(fn func(chainData []byte)) {
 	}
 }
 
-func (e *ExtensionDNSSECChain) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "dnssec_chain ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " entries] "...)
+func (e *ExtensionDNSSECChain) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(chainData []byte) {
+		dst = append(dst, pad...)
 		dst = append(dst, chainData...)
-		dst = append(dst, ' ')
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -2290,13 +2264,11 @@ func (e *ExtensionSequenceNumberEncryptionAlgorithms) Each(fn func(algo uint16))
 	}
 }
 
-func (e *ExtensionSequenceNumberEncryptionAlgorithms) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "sequence_number_encryption_algorithms ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " algos] "...)
+func (e *ExtensionSequenceNumberEncryptionAlgorithms) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(algo uint16) {
-		dst = strconv.AppendInt(dst, int64(algo), 10)
-		dst = append(dst, ' ')
+		dst = append(dst, pad...)
+		dst = fmt.Appendf(dst, "0x%04x", algo)
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -2312,8 +2284,8 @@ func NewExtensionRRC(payload []byte) *ExtensionRRC {
 	return &ExtensionRRC{payload: payload}
 }
 
-func (e *ExtensionRRC) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "rrc"...)
+func (e *ExtensionRRC) AppendDescription(dst []byte, pad string) []byte {
+	_ = pad
 	return dst
 }
 
@@ -2349,13 +2321,11 @@ func (e *ExtensionTLSFlags) Each(fn func(flag uint32)) {
 	}
 }
 
-func (e *ExtensionTLSFlags) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "tls_flags ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " flags] "...)
+func (e *ExtensionTLSFlags) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(flag uint32) {
-		dst = strconv.AppendInt(dst, int64(flag), 10)
-		dst = append(dst, ' ')
+		dst = append(dst, pad...)
+		dst = fmt.Appendf(dst, "0x%08x", flag)
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -2395,13 +2365,11 @@ func (e *ExtensionECHOuterExtensions) Each(fn func(extType uint16)) {
 	}
 }
 
-func (e *ExtensionECHOuterExtensions) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "ech_outer_extensions ["...)
-	dst = strconv.AppendInt(dst, int64(e.Length()), 10)
-	dst = append(dst, " ext_types] "...)
+func (e *ExtensionECHOuterExtensions) AppendDescription(dst []byte, pad string) []byte {
 	e.Each(func(extType uint16) {
-		dst = strconv.AppendInt(dst, int64(extType), 10)
-		dst = append(dst, ' ')
+		dst = append(dst, pad...)
+		dst = fmt.Appendf(dst, "0x%04x", extType)
+		dst = append(dst, '\n')
 	})
 	return dst
 }
@@ -2428,9 +2396,11 @@ func (e *ExtensionEncryptedClientHello) Each(fn func(cipherSuite uint16, keyExch
 	// todo implement me
 }
 
-func (e *ExtensionEncryptedClientHello) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "encrypted_client_hello config_id_len="...)
+func (e *ExtensionEncryptedClientHello) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
+	dst = append(dst, "config_id_len="...)
 	dst = strconv.AppendInt(dst, int64(e.ConfigIDLength()), 10)
+	dst = append(dst, '\n')
 	return dst
 }
 
@@ -2449,8 +2419,10 @@ func (e *ExtensionRenegotiationInfo) VerifiedData() []byte {
 	return e.payload
 }
 
-func (e *ExtensionRenegotiationInfo) AppendDescription(dst []byte) []byte {
-	dst = append(dst, "renegotiation_info verified_data="...)
-	dst = fmt.Appendf(dst, "0x%02x", e.VerifiedData())
+func (e *ExtensionRenegotiationInfo) AppendDescription(dst []byte, pad string) []byte {
+	dst = append(dst, pad...)
+	dst = append(dst, "verified_data="...)
+	dst = fmt.Appendf(dst, "%X", e.payload)
+	dst = append(dst, '\n')
 	return dst
 }

@@ -19,7 +19,7 @@ func (et ExtensionType) String() string {
 }
 
 type ExtensionDescriptor interface {
-	AppendDescription(dst []byte) []byte
+	AppendDescription(dst []byte, pad string) []byte
 }
 
 type Extension struct {
@@ -27,13 +27,14 @@ type Extension struct {
 	Data []byte
 }
 
-func (e *Extension) AppendDescription(dst []byte) []byte {
+func (e *Extension) AppendDescription(dst []byte, pad string) []byte {
 	descrFn, ok := __ext_descr[e.Type]
 	if !ok {
 		dst = append(dst, "N/D"...)
+		return dst
 	}
 	descr := descrFn(e.Data)
-	return descr.AppendDescription(dst)
+	return descr.AppendDescription(dst, pad)
 }
 
 func (vec *vector) parseExtensions(off uint32) (_ uint32, err error) {
