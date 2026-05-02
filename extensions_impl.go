@@ -1729,7 +1729,7 @@ func (e *ExtensionSupportedVersions) Length() int {
 	return int(e.payload[0]) / 2
 }
 
-func (e *ExtensionSupportedVersions) Each(fn func(version uint16)) {
+func (e *ExtensionSupportedVersions) Each(fn func(version MessageVersion)) {
 	if len(e.payload) < 1 {
 		return
 	}
@@ -1741,15 +1741,15 @@ func (e *ExtensionSupportedVersions) Each(fn func(version uint16)) {
 		if 1+i+1 > len(e.payload) {
 			break
 		}
-		version := uint16(e.payload[1+i])<<8 | uint16(e.payload[1+i+1])
+		version := MessageVersion(uint16(e.payload[1+i])<<8 | uint16(e.payload[1+i+1]))
 		fn(version)
 	}
 }
 
 func (e *ExtensionSupportedVersions) AppendDescription(dst []byte, pad string) []byte {
-	e.Each(func(version uint16) {
+	e.Each(func(version MessageVersion) {
 		dst = append(dst, pad...)
-		dst = fmt.Appendf(dst, "0x%04x", version)
+		dst = fmt.Appendf(dst, "%s (0x%04x)", version.String(), version.Raw())
 		dst = append(dst, '\n')
 	})
 	return dst
