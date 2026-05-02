@@ -8,8 +8,11 @@ func (ec EllipticCurve) Raw() uint16 {
 	return uint16(ec)
 }
 
-func (ec EllipticCurve) String() string {
+func (ec EllipticCurve) String() (s string) {
 	enc := __ec[ec]
 	lo, hi := uint16(enc>>16), uint16(enc)
-	return byteconv.B2S(__ec_buf[lo:hi])
+	if s = byteconv.B2S(__ec_buf[lo:hi]); len(s) == 0 {
+		s = "Reserved"
+	}
+	return
 }

@@ -12,10 +12,13 @@ func (cs CipherSuite) Raw() uint16 {
 	return uint16(cs)
 }
 
-func (cs CipherSuite) String() string {
+func (cs CipherSuite) String() (s string) {
 	enc := __cs[cs]
 	lo, hi := uint16(enc>>16), uint16(enc)
-	return byteconv.B2S(__cs_buf[lo:hi])
+	if s = byteconv.B2S(__cs_buf[lo:hi]); len(s) == 0 {
+		s = "Reserved"
+	}
+	return
 }
 
 func (vec *vector) parseCipherSuites(off uint32) (_ uint32, err error) {
