@@ -1,0 +1,58 @@
+Record:
+	Type: HANDSHAKE (22)
+	Legacy version: TLS1.0 (0x0301)
+	Length: 156
+Handshake:
+	Type: CLIENT_HELLO (0x01)
+	Length: 152
+	Legacy version: TLS1.2 (0x0303)
+	Random: 0000000000000000000000000000000000000000000000000000000000000000
+	Session ID Length: 0
+	Session ID: N/D
+	Cipher Suites:
+		TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (0xC02F)
+		TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 (0xC02B)
+		TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (0xC030)
+		TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 (0xC02C)
+		TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256 (0xC027)
+		TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA (0xC013)
+		TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256 (0xC023)
+		TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA (0xC009)
+		TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA (0xC014)
+		TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA (0xC00A)
+		TLS_RSA_WITH_AES_128_GCM_SHA256 (0x9C)
+		TLS_RSA_WITH_AES_256_GCM_SHA384 (0x9D)
+		TLS_RSA_WITH_AES_128_CBC_SHA256 (0x3C)
+		TLS_RSA_WITH_AES_128_CBC_SHA (0x2F)
+		TLS_RSA_WITH_AES_256_CBC_SHA (0x35)
+		TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA (0xC012)
+		TLS_RSA_WITH_3DES_EDE_CBC_SHA (0x0A)
+		TLS_RSA_WITH_RC4_128_SHA (0x05)
+		TLS_ECDHE_RSA_WITH_RC4_128_SHA (0xC011)
+		TLS_ECDHE_ECDSA_WITH_RC4_128_SHA (0xC007)
+	Compression Method Length: 1
+	Compression Method: NULL (0)
+	Extensions:
+		 (0x3374):
+N/D		status_request (0x0005):
+			type=1
+			responder_ids [0]
+			request_ext_len=0
+		supported_groups (renamed from "elliptic_curves") (0x000A):
+			secp256r1 (0x0017) 
+			secp384r1 (0x0018) 
+			secp521r1 (0x0019) 
+		ec_point_formats (0x000B):
+			uncompressed (0x00) 
+		signature_algorithms (0x000D):
+			rsa (0x01) 
+			ecdsa (0x03) 
+			rsa (0x01) 
+			ecdsa (0x03) 
+			rsa (0x01) 
+			ecdsa (0x03) 
+		renegotiation_info (0xFF01):
+			verified_data=00
+		application_layer_protocol_negotiation (0x0010):
+			proto3
+		signed_certificate_timestamp (0x0012):

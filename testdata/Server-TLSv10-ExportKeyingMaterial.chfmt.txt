@@ -1,0 +1,31 @@
+Record:
+	Type: HANDSHAKE (22)
+	Legacy version: TLS1.0 (0x0301)
+	Length: 85
+Handshake:
+	Type: CLIENT_HELLO (0x01)
+	Length: 81
+	Legacy version: TLS1.0 (0x0301)
+	Random: E08D7BF28D459FC5401BBE8105A18382C1544AC71CF1F8D56C7AFF9381E2A2BA
+	Session ID Length: 0
+	Session ID: N/D
+	Cipher Suites:
+		TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA (0xC014)
+		TLS_EMPTY_RENEGOTIATION_INFO_SCSV (0xFF)
+	Compression Method Length: 1
+	Compression Method: NULL (0)
+	Extensions:
+		ec_point_formats (0x000B):
+			uncompressed (0x00) 
+			ansiX962_compressed_prime (0x01) 
+			ansiX962_compressed_char2 (0x02) 
+		supported_groups (renamed from "elliptic_curves") (0x000A):
+			x25519 (0x001d) 
+			secp256r1 (0x0017) 
+			x448 (0x001e) 
+			secp521r1 (0x0019) 
+			secp384r1 (0x0018) 
+		session_ticket (renamed from "SessionTicket TLS") (0x0023):
+			0
+		encrypt_then_mac (0x0016):
+		extended_main_secret (0x0017):

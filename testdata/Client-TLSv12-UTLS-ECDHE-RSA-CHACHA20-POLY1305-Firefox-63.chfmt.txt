@@ -1,0 +1,82 @@
+Record:
+	Type: HANDSHAKE (22)
+	Legacy version: TLS1.0 (0x0301)
+	Length: 512
+Handshake:
+	Type: CLIENT_HELLO (0x01)
+	Length: 508
+	Legacy version: TLS1.2 (0x0303)
+	Random: 0000000000000000000000000000000000000000000000000000000000000000
+	Session ID Length: 32
+	Session ID: 0000000000000000000000000000000000000000000000000000000000000000
+	Cipher Suites:
+		TLS_AES_128_GCM_SHA256 (0x1301)
+		TLS_CHACHA20_POLY1305_SHA256 (0x1303)
+		TLS_AES_256_GCM_SHA384 (0x1302)
+		TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 (0xC02B)
+		TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (0xC02F)
+		TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 (0xCCA9)
+		TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256 (0xCCA8)
+		TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 (0xC02C)
+		TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (0xC030)
+		TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA (0xC00A)
+		TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA (0xC009)
+		TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA (0xC013)
+		TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA (0xC014)
+		TLS_DHE_RSA_WITH_AES_128_CBC_SHA (0x33)
+		TLS_DHE_RSA_WITH_AES_256_CBC_SHA (0x39)
+		TLS_RSA_WITH_AES_128_CBC_SHA (0x2F)
+		TLS_RSA_WITH_AES_256_CBC_SHA (0x35)
+		TLS_RSA_WITH_3DES_EDE_CBC_SHA (0x0A)
+	Compression Method Length: 1
+	Compression Method: NULL (0)
+	Extensions:
+		server_name (0x0000):
+			type=0 name=foobar.com
+		extended_main_secret (0x0017):
+		renegotiation_info (0xFF01):
+			verified_data=00
+		supported_groups (renamed from "elliptic_curves") (0x000A):
+			x25519 (0x001d) 
+			secp256r1 (0x0017) 
+			secp384r1 (0x0018) 
+			secp521r1 (0x0019) 
+			ffdhe2048 (0x0100) 
+			ffdhe3072 (0x0101) 
+		ec_point_formats (0x000B):
+			uncompressed (0x00) 
+		session_ticket (renamed from "SessionTicket TLS") (0x0023):
+			0
+		application_layer_protocol_negotiation (0x0010):
+			h2
+			http/1.1
+		status_request (0x0005):
+			type=1
+			responder_ids [0]
+			request_ext_len=0
+		key_share (0x0033):
+			group=29 key=2FE57DA347CD62431528DAAC5FBB290730FFF684AFC4CFC2ED90995F58CB3B74
+			group=23 key=041E1837EF0D195188357571B5E5545B122E8F0967FDA724203EB2561CCE97285EF82B2D4F9EF1079F6C4B5B8356E23242E958B6D749A6B5681A4103566BDC5A89
+		supported_versions (0x002B):
+			TLS1.3 (0x0304)
+			TLS1.2 (0x0303)
+			TLS1.1 (0x0302)
+			TLS1.0 (0x0301)
+		signature_algorithms (0x000D):
+			ecdsa (0x03) 
+			ecdsa (0x03) 
+			ecdsa (0x03) 
+			Reserved (0x04) 
+			Reserved (0x05) 
+			Reserved (0x06) 
+			rsa (0x01) 
+			rsa (0x01) 
+			rsa (0x01) 
+			ecdsa (0x03) 
+			rsa (0x01) 
+		psk_key_exchange_modes (0x002D):
+			0x01
+		record_size_limit (0x001C):
+			16385
+		padding (0x0015):
+			148

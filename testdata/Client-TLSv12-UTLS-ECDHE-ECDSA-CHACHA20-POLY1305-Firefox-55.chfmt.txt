@@ -1,0 +1,63 @@
+Record:
+	Type: HANDSHAKE (22)
+	Legacy version: TLS1.0 (0x0301)
+	Length: 214
+Handshake:
+	Type: CLIENT_HELLO (0x01)
+	Length: 210
+	Legacy version: TLS1.2 (0x0303)
+	Random: 0000000000000000000000000000000000000000000000000000000000000000
+	Session ID Length: 32
+	Session ID: 0000000000000000000000000000000000000000000000000000000000000000
+	Cipher Suites:
+		TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 (0xC02B)
+		TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 (0xC02F)
+		TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 (0xCCA9)
+		TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256 (0xCCA8)
+		TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 (0xC02C)
+		TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 (0xC030)
+		TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA (0xC00A)
+		TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA (0xC009)
+		TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA (0xC013)
+		TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA (0xC014)
+		TLS_DHE_RSA_WITH_AES_128_CBC_SHA (0x33)
+		TLS_DHE_RSA_WITH_AES_256_CBC_SHA (0x39)
+		TLS_RSA_WITH_AES_128_CBC_SHA (0x2F)
+		TLS_RSA_WITH_AES_256_CBC_SHA (0x35)
+		TLS_RSA_WITH_3DES_EDE_CBC_SHA (0x0A)
+	Compression Method Length: 1
+	Compression Method: NULL (0)
+	Extensions:
+		server_name (0x0000):
+			type=0 name=foobar.com
+		extended_main_secret (0x0017):
+		renegotiation_info (0xFF01):
+			verified_data=00
+		supported_groups (renamed from "elliptic_curves") (0x000A):
+			x25519 (0x001d) 
+			secp256r1 (0x0017) 
+			secp384r1 (0x0018) 
+			secp521r1 (0x0019) 
+		ec_point_formats (0x000B):
+			uncompressed (0x00) 
+		session_ticket (renamed from "SessionTicket TLS") (0x0023):
+			0
+		application_layer_protocol_negotiation (0x0010):
+			h2
+			http/1.1
+		status_request (0x0005):
+			type=1
+			responder_ids [0]
+			request_ext_len=0
+		signature_algorithms (0x000D):
+			ecdsa (0x03) 
+			ecdsa (0x03) 
+			ecdsa (0x03) 
+			Reserved (0x04) 
+			Reserved (0x05) 
+			Reserved (0x06) 
+			rsa (0x01) 
+			rsa (0x01) 
+			rsa (0x01) 
+			ecdsa (0x03) 
+			rsa (0x01) 

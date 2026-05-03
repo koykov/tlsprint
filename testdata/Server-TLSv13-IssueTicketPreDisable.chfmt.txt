@@ -1,0 +1,52 @@
+Record:
+	Type: HANDSHAKE (22)
+	Legacy version: TLS1.0 (0x0301)
+	Length: 206
+Handshake:
+	Type: CLIENT_HELLO (0x01)
+	Length: 202
+	Legacy version: TLS1.2 (0x0303)
+	Random: 1F69F6999FEE8123415D81D6AA1B5A449E5678216AFAA1179B6F973DD5EE117A
+	Session ID Length: 32
+	Session ID: 01BD29E66BBE9E23353AAB47926F71B36982637D43C0AEEB058E549BE955ECC2
+	Cipher Suites:
+		TLS_AES_128_GCM_SHA256 (0x1301)
+		TLS_EMPTY_RENEGOTIATION_INFO_SCSV (0xFF)
+	Compression Method Length: 1
+	Compression Method: NULL (0)
+	Extensions:
+		ec_point_formats (0x000B):
+			uncompressed (0x00) 
+			ansiX962_compressed_prime (0x01) 
+			ansiX962_compressed_char2 (0x02) 
+		supported_groups (renamed from "elliptic_curves") (0x000A):
+			x25519 (0x001d) 
+			secp256r1 (0x0017) 
+			x448 (0x001e) 
+			secp521r1 (0x0019) 
+			secp384r1 (0x0018) 
+		session_ticket (renamed from "SessionTicket TLS") (0x0023):
+			0
+		encrypt_then_mac (0x0016):
+		extended_main_secret (0x0017):
+		signature_algorithms (0x000D):
+			ecdsa (0x03) 
+			ecdsa (0x03) 
+			ecdsa (0x03) 
+			ed25519 (0x07) 
+			ed448 (0x08) 
+			Reserved (0x09) 
+			Reserved (0x0a) 
+			Reserved (0x0b) 
+			Reserved (0x04) 
+			Reserved (0x05) 
+			Reserved (0x06) 
+			rsa (0x01) 
+			rsa (0x01) 
+			rsa (0x01) 
+		supported_versions (0x002B):
+			TLS1.3 (0x0304)
+		psk_key_exchange_modes (0x002D):
+			0x01
+		key_share (0x0033):
+			group=29 key=9C9086EC0CC94E434DD7003D395025C9B9F87FCC6A3995BCF01F0DBCA721FF69

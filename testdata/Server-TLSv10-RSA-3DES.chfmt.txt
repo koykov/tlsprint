@@ -1,0 +1,19 @@
+Record:
+	Type: HANDSHAKE (22)
+	Legacy version: TLS1.0 (0x0301)
+	Length: 57
+Handshake:
+	Type: CLIENT_HELLO (0x01)
+	Length: 53
+	Legacy version: TLS1.0 (0x0301)
+	Random: 517A488DDE0B300F9A9156302030DDBD743BE2D7DB463DBF6FB6AE538A7D1850
+	Session ID Length: 0
+	Session ID: N/D
+	Cipher Suites:
+		TLS_RSA_WITH_3DES_EDE_CBC_SHA (0x0A)
+		TLS_EMPTY_RENEGOTIATION_INFO_SCSV (0xFF)
+	Compression Method Length: 1
+	Compression Method: NULL (0)
+	Extensions:
+		encrypt_then_mac (0x0016):
+		extended_main_secret (0x0017):

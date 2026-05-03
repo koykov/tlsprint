@@ -1,0 +1,47 @@
+Record:
+	Type: HANDSHAKE (22)
+	Legacy version: TLS1.0 (0x0301)
+	Length: 229
+Handshake:
+	Type: CLIENT_HELLO (0x01)
+	Length: 225
+	Legacy version: TLS1.2 (0x0303)
+	Random: 582D84F24F6D109DF65A67C79278E67D9696FEDB370744E32E853F1A5FF12A24
+	Session ID Length: 32
+	Session ID: CBE8E8C4E92801219F82D2DA6B3EA07F0D209512395B3FF80486DF9B723B74E2
+	Cipher Suites:
+		TLS_CHACHA20_POLY1305_SHA256 (0x1303)
+		TLS_EMPTY_RENEGOTIATION_INFO_SCSV (0xFF)
+	Compression Method Length: 1
+	Compression Method: NULL (0)
+	Extensions:
+		ec_point_formats (0x000B):
+			uncompressed (0x00) 
+			ansiX962_compressed_prime (0x01) 
+			ansiX962_compressed_char2 (0x02) 
+		supported_groups (renamed from "elliptic_curves") (0x000A):
+			secp256r1 (0x0017) 
+			x25519 (0x001d) 
+		encrypt_then_mac (0x0016):
+		extended_main_secret (0x0017):
+		signature_algorithms (0x000D):
+			ecdsa (0x03) 
+			ecdsa (0x03) 
+			ecdsa (0x03) 
+			ed25519 (0x07) 
+			ed448 (0x08) 
+			Reserved (0x09) 
+			Reserved (0x0a) 
+			Reserved (0x0b) 
+			Reserved (0x04) 
+			Reserved (0x05) 
+			Reserved (0x06) 
+			rsa (0x01) 
+			rsa (0x01) 
+			rsa (0x01) 
+		supported_versions (0x002B):
+			TLS1.3 (0x0304)
+		psk_key_exchange_modes (0x002D):
+			0x01
+		key_share (0x0033):
+			group=23 key=046303F690DF1FD0039624213DE4C05D385F5385A49CD8F7B09C645F53C3669BF5E05A600BB2E82BD06AA2FF1D078B5FA837E4743515B106DE793BF469522AAD66
