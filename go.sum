@@ -1,4 +1,6 @@
 github.com/koykov/byteconv v1.0.1 h1:5Yb6++P+HnipDW/V9rHXR7CyS0ZFncspT4isvt65fFA=
 github.com/koykov/byteconv v1.0.1/go.mod h1:viZknv/akQJrXOQS3bZu2U7TE+gjA03LFQpSsRExZR4=
+github.com/koykov/byteptr v1.0.1 h1:X0rz37+YM/Cfqw9qZmpbVxT9x/AaktHaa8Gy7sUmTEc=
+github.com/koykov/byteptr v1.0.1/go.mod h1:A129Z2xwTwnOtWt1f+0LN6lbRQNnvKz3AAeyLCxUpqc=
 golang.org/x/text v0.22.0 h1:bofq7m3/HAFvbF51jz3Q9wLg3jkvSPuiZu/pD1XwgtM=
 golang.org/x/text v0.22.0/go.mod h1:YRoo4H8PVmsu+E3Ou7cqLVH8oXWIHVoX0jqUWALQhfY=

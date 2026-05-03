@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 
 	"github.com/koykov/byteconv"
+	"github.com/koykov/byteptr"
 )
 
 type ExtensionType uint16
@@ -24,7 +25,7 @@ type ExtensionDescriptor interface {
 
 type Extension struct {
 	Type ExtensionType
-	Data []byte
+	Data byteptr.Byteptr
 }
 
 func (e *Extension) AppendDescription(dst []byte, pad string) []byte {
@@ -33,7 +34,8 @@ func (e *Extension) AppendDescription(dst []byte, pad string) []byte {
 		dst = append(dst, "N/D"...)
 		return dst
 	}
-	descr := descrFn(e.Data)
+	e.Data.Bytes()
+	descr := descrFn(e.Data.Bytes())
 	return descr.AppendDescription(dst, pad)
 }
 
@@ -51,10 +53,8 @@ func (vec *vector) parseExtensions(off uint32) (_ uint32, err error) {
 		var e Extension
 		e.Type = ExtensionType(binary.BigEndian.Uint16(raw[0:2]))
 		eln := binary.BigEndian.Uint16(raw[2:4])
-		if raw, off, err = vec.cut(off, uint32(eln)); err != nil {
-			return off, err
-		}
-		e.Data = raw
+		e.Data.Init(vec.raw, int(off), int(eln))
+		off += uint32(eln)
 		vec.ext = append(vec.ext, e)
 		i += eln
 	}
