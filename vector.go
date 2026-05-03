@@ -38,8 +38,8 @@ type vector struct {
 	mtyp MessageType    // message type
 	mlen uint32         // message length
 	mver MessageVersion // TLS version (legacy)
-	rand []byte         // client random
-	sid  []byte         // session ID
+	rand uint64         // client random
+	sid  uint64         // session ID
 	chps []CipherSuite  // cipher suites
 	cmpl uint8          // compression method
 	cmps uint8          // compression method
@@ -75,11 +75,13 @@ func (vec *vector) LegacyVersion() MessageVersion {
 }
 
 func (vec *vector) Random() []byte {
-	return vec.rand
+	lo, hi := uint32(vec.rand>>32), uint32(vec.rand)
+	return vec.raw[lo:hi]
 }
 
 func (vec *vector) SessionID() []byte {
-	return vec.sid
+	lo, hi := uint32(vec.sid>>32), uint32(vec.sid)
+	return vec.raw[lo:hi]
 }
 
 func (vec *vector) CipherSuites() []CipherSuite {
@@ -106,10 +108,11 @@ func (vec *vector) String() string {
 	vec.buf = fmt.Appendf(vec.buf, "\tType: %s (0x%02X)\n", vec.mtyp.String(), vec.mtyp.Raw())
 	vec.buf = fmt.Appendf(vec.buf, "\tLength: %d\n", vec.mlen)
 	vec.buf = fmt.Appendf(vec.buf, "\tLegacy version: %s (0x%04X)\n", vec.mver.String(), vec.mver.Raw())
-	vec.buf = fmt.Appendf(vec.buf, "\tRandom: %X\n", vec.rand)
-	vec.buf = fmt.Appendf(vec.buf, "\tSession ID Length: %d\n", len(vec.sid))
-	if len(vec.sid) > 0 {
-		vec.buf = fmt.Appendf(vec.buf, "\tSession ID: %X\n", vec.sid)
+	vec.buf = fmt.Appendf(vec.buf, "\tRandom: %X\n", vec.Random())
+	sid := vec.SessionID()
+	vec.buf = fmt.Appendf(vec.buf, "\tSession ID Length: %d\n", len(sid))
+	if len(sid) > 0 {
+		vec.buf = fmt.Appendf(vec.buf, "\tSession ID: %X\n", sid)
 	} else {
 		vec.buf = append(vec.buf, "\tSession ID: N/D\n"...)
 	}
@@ -155,8 +158,8 @@ func (vec *vector) Reset() {
 	vec.mtyp = MessageTypeUnknown
 	vec.mlen = 0
 	vec.mver = 0
-	vec.rand = vec.rand[:0]
-	vec.sid = vec.sid[:0]
+	vec.rand = 0
+	vec.sid = 0
 	vec.chps = vec.chps[:0]
 	vec.cmpl = 0
 	vec.cmps = 0
