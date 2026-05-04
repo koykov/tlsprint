@@ -98,10 +98,10 @@ func getTBName(tb testing.TB) string {
 }
 
 func TestParser(t *testing.T) {
-	t.Run("client hello", func(t *testing.T) {
-		for i := 0; i < len(stages); i++ {
-			st := &stages[i]
-			t.Run(st.key, func(t *testing.T) {
+	for i := 0; i < len(stages); i++ {
+		st := &stages[i]
+		t.Run(st.key, func(t *testing.T) {
+			t.Run("client hello", func(t *testing.T) {
 				vec := New()
 				err := vec.Parse(st.flows[0])
 				if err != nil {
@@ -112,15 +112,16 @@ func TestParser(t *testing.T) {
 					t.Errorf("mismatch result and expectation")
 				}
 			})
-		}
-	})
+
+		})
+	}
 }
 
 func BenchmarkParser(b *testing.B) {
-	b.Run("client hello", func(b *testing.B) {
-		for i := 0; i < len(stages); i++ {
-			st := &stages[i]
-			b.Run(st.key, func(b *testing.B) {
+	for i := 0; i < len(stages); i++ {
+		st := &stages[i]
+		b.Run(st.key, func(b *testing.B) {
+			b.Run("client hello", func(b *testing.B) {
 				vec := New()
 				b.SetBytes(int64(len(st.flows[0])))
 				b.ReportAllocs()
@@ -130,6 +131,6 @@ func BenchmarkParser(b *testing.B) {
 					_ = vec.Parse(st.flows[0])
 				}
 			})
-		}
-	})
+		})
+	}
 }
