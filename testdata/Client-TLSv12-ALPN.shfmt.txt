@@ -1,0 +1,25 @@
+Record:
+	Type: HANDSHAKE (22)
+	Legacy version: TLS1.2 (0x0303)
+	Length: 106
+Handshake:
+	Type: SERVER_HELLO (0x02)
+	Length: 102
+	Legacy version: TLS1.2 (0x0303)
+	Random: 71BA32F4083123EA7146B6F024F980C294B813F5CC6B77E546F176DFA50C566A
+	Session ID Length: 32
+	Session ID: 985312A3D2A697453611E6B6B66E0BB9302D65C847C7AF4CC5A651902F77DB8C
+	Cipher Suites:
+		TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256 (0xCCA8)
+	Compression Method Length: 0
+	Compression Method: NULL (0)
+	Extensions:
+		renegotiation_info (0xFF01):
+			verified_data=00
+		ec_point_formats (0x000B):
+			uncompressed (0x00) 
+			ansiX962_compressed_prime (0x01) 
+			ansiX962_compressed_char2 (0x02) 
+		application_layer_protocol_negotiation (0x0010):
+			proto1
+		extended_main_secret (0x0017):

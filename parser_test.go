@@ -18,6 +18,7 @@ type stage struct {
 	origin []byte
 	flows  [][]byte
 	chfmt  []byte
+	shfmt  []byte
 }
 
 var (
@@ -76,6 +77,7 @@ func init() {
 			}
 
 			st.chfmt, _ = os.ReadFile(strings.Replace(path, ".raw", ".chfmt.txt", 1))
+			st.shfmt, _ = os.ReadFile(strings.Replace(path, ".raw", ".shfmt.txt", 1))
 			stages = append(stages, st)
 			stagesReg[st.key] = len(stages) - 1
 			return nil
@@ -112,25 +114,40 @@ func TestParser(t *testing.T) {
 					t.Errorf("mismatch result and expectation")
 				}
 			})
-
+			t.Run("server hello", func(t *testing.T) {
+				if len(st.shfmt) == 0 {
+					t.Skip()
+				}
+				vec := New()
+				err := vec.Parse(st.flows[1])
+				if err != nil {
+					t.Fatal(err)
+				}
+				s := vec.String()
+				if !bytes.Equal([]byte(s), st.shfmt) {
+					t.Errorf("mismatch result and expectation")
+				}
+			})
 		})
 	}
 }
 
 func BenchmarkParser(b *testing.B) {
+	benchfn := func(b *testing.B, st *stage, flowID int) {
+		vec := New()
+		b.SetBytes(int64(len(st.flows[flowID])))
+		b.ReportAllocs()
+		b.ResetTimer()
+		for j := 0; j < b.N; j++ {
+			vec.Reset()
+			_ = vec.Parse(st.flows[flowID])
+		}
+	}
 	for i := 0; i < len(stages); i++ {
 		st := &stages[i]
 		b.Run(st.key, func(b *testing.B) {
-			b.Run("client hello", func(b *testing.B) {
-				vec := New()
-				b.SetBytes(int64(len(st.flows[0])))
-				b.ReportAllocs()
-				b.ResetTimer()
-				for j := 0; j < b.N; j++ {
-					vec.Reset()
-					_ = vec.Parse(st.flows[0])
-				}
-			})
+			b.Run("client hello", func(b *testing.B) { benchfn(b, st, 0) })
+			b.Run("server hello", func(b *testing.B) { benchfn(b, st, 1) })
 		})
 	}
 }

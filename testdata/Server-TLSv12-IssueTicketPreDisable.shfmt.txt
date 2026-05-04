@@ -1,0 +1,21 @@
+Record:
+	Type: HANDSHAKE (22)
+	Legacy version: TLS1.2 (0x0303)
+	Length: 57
+Handshake:
+	Type: SERVER_HELLO (0x02)
+	Length: 53
+	Legacy version: TLS1.2 (0x0303)
+	Random: 000000000000000000000000000000000000000000000000444F574E47524401
+	Session ID Length: 0
+	Session ID: N/D
+	Cipher Suites:
+		TLS_RSA_WITH_AES_128_CBC_SHA (0x2F)
+	Compression Method Length: 0
+	Compression Method: NULL (0)
+	Extensions:
+		session_ticket (renamed from "SessionTicket TLS") (0x0023):
+			0
+		renegotiation_info (0xFF01):
+			verified_data=00
+		extended_main_secret (0x0017):

@@ -1,0 +1,18 @@
+Record:
+	Type: HANDSHAKE (22)
+	Legacy version: TLS1.2 (0x0303)
+	Length: 122
+Handshake:
+	Type: SERVER_HELLO (0x02)
+	Length: 118
+	Legacy version: TLS1.2 (0x0303)
+	Random: 0000000000000000000000000000000000000000000000000000000000000000
+	Session ID Length: 32
+	Session ID: 90E64E2334722AAD9ACF952020F0E9CF7A4A57658709C77679259C3E16224CC5
+	Cipher Suites:
+		TLS_AES_128_GCM_SHA256 (0x1301)
+	Compression Method Length: 0
+	Compression Method: NULL (0)
+	Extensions:
+		supported_versions (0x002B):
+		key_share (0x0033):
