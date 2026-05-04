@@ -1,6 +1,6 @@
 package tlsvector
 
-func (vec *vector) parseCompressionMethod(off uint32) (_ uint32, err error) {
+func (vec *vector) parseCompressionMethods(off uint32) (_ uint32, err error) {
 	var raw []byte
 	if raw, off, err = vec.cut(off, 1); err != nil {
 		return off, err
@@ -15,6 +15,15 @@ func (vec *vector) parseCompressionMethod(off uint32) (_ uint32, err error) {
 	}
 	vec.cmpl = uint8(ln)
 	if raw, off, err = vec.cut(off, ln); err != nil {
+		return off, err
+	}
+	vec.cmps = raw[0]
+	return off, err
+}
+
+func (vec *vector) parseCompressionMethod(off uint32) (_ uint32, err error) {
+	var raw []byte
+	if raw, off, err = vec.cut(off, 1); err != nil {
 		return off, err
 	}
 	vec.cmps = raw[0]

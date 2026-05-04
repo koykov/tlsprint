@@ -22,11 +22,21 @@ func (vec *vector) Parse(raw []byte) (err error) {
 	if off, err = vec.parseSessionID(off); err != nil {
 		return
 	}
-	if off, err = vec.parseCipherSuites(off); err != nil {
-		return
-	}
-	if off, err = vec.parseCompressionMethod(off); err != nil {
-		return
+	switch vec.mtyp {
+	case MessageTypeClientHello:
+		if off, err = vec.parseCipherSuites(off); err != nil {
+			return
+		}
+		if off, err = vec.parseCompressionMethods(off); err != nil {
+			return
+		}
+	case MessageTypeServerHello:
+		if off, err = vec.parseCipherSuite(off); err != nil {
+			return
+		}
+		if off, err = vec.parseCompressionMethod(off); err != nil {
+			return
+		}
 	}
 	if off, err = vec.parseExtensions(off); err != nil {
 		return

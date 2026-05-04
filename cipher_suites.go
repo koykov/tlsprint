@@ -35,3 +35,12 @@ func (vec *vector) parseCipherSuites(off uint32) (_ uint32, err error) {
 	}
 	return off, err
 }
+
+func (vec *vector) parseCipherSuite(off uint32) (_ uint32, err error) {
+	var raw []byte
+	if raw, off, err = vec.cut(off, 2); err != nil {
+		return off, err
+	}
+	vec.chps = append(vec.chps, CipherSuite(binary.BigEndian.Uint16(raw)))
+	return off, err
+}
