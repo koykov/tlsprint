@@ -1,8 +1,10 @@
 package tlsvector
 
 import (
+	"crypto/md5"
 	"fmt"
 	"io"
+	"strconv"
 
 	"github.com/koykov/byteconv"
 )
@@ -25,6 +27,7 @@ type Interface interface {
 	CipherSuites() []CipherSuite
 	CompressionMethod() uint8
 	Extensions() []Extension
+	JA3() string
 }
 
 type vector struct {
@@ -94,6 +97,52 @@ func (vec *vector) CompressionMethod() uint8 {
 
 func (vec *vector) Extensions() []Extension {
 	return vec.ext
+}
+
+func (vec *vector) JA3() string {
+	vec.buf = vec.buf[:0]
+	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.rver), 10)
+	vec.buf = append(vec.buf, ',')
+
+	for i := 0; i < len(vec.chps); i++ {
+		vec.buf = strconv.AppendUint(vec.buf, uint64(vec.chps[i].Raw()), 10)
+		vec.buf = append(vec.buf, ',')
+	}
+
+	ec, ecpf := -1, -1
+	for i := 0; i < len(vec.ext); i++ {
+		vec.buf = strconv.AppendUint(vec.buf, uint64(vec.ext[i].Type.Raw()), 10)
+		vec.buf = append(vec.buf, ',')
+		if vec.ext[i].Type.Raw() == 0x000a {
+			ec = i
+		}
+		if vec.ext[i].Type.Raw() == 0x000b {
+			ecpf = i
+		}
+	}
+
+	if ec >= 0 {
+		ext := NewExtensionSupportedGroups(vec.ext[ec].Data.Bytes())
+		ext.Each(func(group EllipticCurve) {
+			vec.buf = strconv.AppendUint(vec.buf, uint64(group.Raw()), 10)
+			vec.buf = append(vec.buf, ',')
+		})
+	}
+
+	if ecpf >= 0 {
+		ext := NewExtensionECPointFormats(vec.ext[ecpf].Data.Bytes())
+		ext.Each(func(format ECPointFormats) {
+			vec.buf = strconv.AppendUint(vec.buf, uint64(format.Raw()), 10)
+			vec.buf = append(vec.buf, ',')
+		})
+	}
+
+	bin := vec.buf[:len(vec.buf)-1]
+	off := len(vec.buf)
+	h := md5.Sum(bin)
+	vec.buf = fmt.Appendf(vec.buf, "%x", h)
+
+	return byteconv.B2S(vec.buf[off:])
 }
 
 func (vec *vector) String() string {
