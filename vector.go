@@ -104,37 +104,61 @@ func (vec *vector) JA3() string {
 	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.rver), 10)
 	vec.buf = append(vec.buf, ',')
 
-	for i := 0; i < len(vec.chps); i++ {
-		vec.buf = strconv.AppendUint(vec.buf, uint64(vec.chps[i].Raw()), 10)
+	if len(vec.chps) > 0 {
+		for i := 0; i < len(vec.chps); i++ {
+			if i > 0 {
+				vec.buf = append(vec.buf, '-')
+			}
+			vec.buf = strconv.AppendUint(vec.buf, uint64(vec.chps[i].Raw()), 10)
+		}
 		vec.buf = append(vec.buf, ',')
 	}
 
 	ec, ecpf := -1, -1
-	for i := 0; i < len(vec.ext); i++ {
-		vec.buf = strconv.AppendUint(vec.buf, uint64(vec.ext[i].Type.Raw()), 10)
+	if len(vec.ext) > 0 {
+		for i := 0; i < len(vec.ext); i++ {
+			if i > 0 {
+				vec.buf = append(vec.buf, '-')
+			}
+			vec.buf = strconv.AppendUint(vec.buf, uint64(vec.ext[i].Type.Raw()), 10)
+			if vec.ext[i].Type.Raw() == 0x000a {
+				ec = i
+			}
+			if vec.ext[i].Type.Raw() == 0x000b {
+				ecpf = i
+			}
+		}
 		vec.buf = append(vec.buf, ',')
-		if vec.ext[i].Type.Raw() == 0x000a {
-			ec = i
-		}
-		if vec.ext[i].Type.Raw() == 0x000b {
-			ecpf = i
-		}
 	}
 
 	if ec >= 0 {
+		var c int
 		ext := NewExtensionSupportedGroups(vec.ext[ec].Data.Bytes())
 		ext.Each(func(group EllipticCurve) {
+			if c > 0 {
+				vec.buf = append(vec.buf, '-')
+			}
 			vec.buf = strconv.AppendUint(vec.buf, uint64(group.Raw()), 10)
-			vec.buf = append(vec.buf, ',')
+			c++
 		})
+		if c > 0 {
+			vec.buf = append(vec.buf, ',')
+		}
 	}
 
 	if ecpf >= 0 {
+		var c int
 		ext := NewExtensionECPointFormats(vec.ext[ecpf].Data.Bytes())
 		ext.Each(func(format ECPointFormats) {
+			if c > 0 {
+				vec.buf = append(vec.buf, '-')
+			}
 			vec.buf = strconv.AppendUint(vec.buf, uint64(format.Raw()), 10)
-			vec.buf = append(vec.buf, ',')
+			c++
 		})
+		if c > 0 {
+			vec.buf = append(vec.buf, ',')
+		}
 	}
 
 	bin := vec.buf[:len(vec.buf)-1]
