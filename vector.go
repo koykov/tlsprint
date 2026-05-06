@@ -3,6 +3,7 @@ package tlsvector
 import (
 	"crypto/md5"
 	"fmt"
+	"hash"
 	"io"
 	"strconv"
 
@@ -47,6 +48,8 @@ type vector struct {
 	cmpl uint8          // compression method
 	cmps uint8          // compression method
 	ext  []Extension    // extensions
+
+	ja3 hash.Hash
 }
 
 func New() Interface {
@@ -161,9 +164,13 @@ func (vec *vector) JA3() string {
 		}
 	}
 
+	if vec.ja3 == nil {
+		vec.ja3 = md5.New()
+	}
 	bin := vec.buf[:len(vec.buf)-1]
+	vec.ja3.Reset()
+	h := vec.ja3.Sum(bin)
 	off := len(vec.buf)
-	h := md5.Sum(bin)
 	vec.buf = fmt.Appendf(vec.buf, "%x", h)
 
 	return byteconv.B2S(vec.buf[off:])
@@ -237,6 +244,8 @@ func (vec *vector) Reset() {
 	vec.cmpl = 0
 	vec.cmps = 0
 	vec.ext = vec.ext[:0]
+
+	vec.ja3.Reset()
 }
 
 func (vec *vector) cut(off, delta uint32) ([]byte, uint32, error) {
