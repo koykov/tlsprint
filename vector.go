@@ -2,6 +2,7 @@ package tlsvector
 
 import (
 	"crypto/md5"
+	"encoding/hex"
 	"fmt"
 	"hash"
 	"io"
@@ -169,9 +170,14 @@ func (vec *vector) JA3() string {
 	}
 	bin := vec.buf[:len(vec.buf)-1]
 	vec.ja3.Reset()
-	h := vec.ja3.Sum(bin)
+	vec.ja3.Write(bin)
 	off := len(vec.buf)
-	vec.buf = fmt.Appendf(vec.buf, "%x", h)
+	vec.buf = append(vec.buf, "0000000000000000"...)
+	h := vec.ja3.Sum(vec.buf[off:off])
+
+	off = len(vec.buf)
+	vec.buf = append(vec.buf, "00000000000000000000000000000000"...)
+	hex.Encode(vec.buf[off:off+32], h)
 
 	return byteconv.B2S(vec.buf[off:])
 }
@@ -245,7 +251,9 @@ func (vec *vector) Reset() {
 	vec.cmps = 0
 	vec.ext = vec.ext[:0]
 
-	vec.ja3.Reset()
+	if vec.ja3 != nil {
+		vec.ja3.Reset()
+	}
 }
 
 func (vec *vector) cut(off, delta uint32) ([]byte, uint32, error) {
