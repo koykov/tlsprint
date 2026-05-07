@@ -8,7 +8,7 @@ import (
 	"github.com/koykov/byteconv"
 )
 
-func (vec *vector) JA3() string {
+func (vec *vector) ja3s() []byte {
 	vec.buf = vec.buf[:0]
 	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.mver), 10)
 	vec.buf = append(vec.buf, ',')
@@ -86,7 +86,15 @@ func (vec *vector) JA3() string {
 	}
 
 	bin := vec.buf[:len(vec.buf)-1]
-	println(string(bin))
+	return bin
+}
+
+func (vec *vector) JA3String() string {
+	return byteconv.B2S(vec.ja3s())
+}
+
+func (vec *vector) JA3() string {
+	bin := vec.ja3s()
 	if vec.ja3 == nil {
 		vec.ja3 = md5.New()
 	}

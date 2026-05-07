@@ -1,12 +1,9 @@
 package tlsvector
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"fmt"
 	"hash"
 	"io"
-	"strconv"
 
 	"github.com/koykov/byteconv"
 )
@@ -30,6 +27,7 @@ type Interface interface {
 	CompressionMethod() uint8
 	Extensions() []Extension
 	JA3() string
+	JA3String() string
 }
 
 type vector struct {
