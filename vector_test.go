@@ -5,7 +5,7 @@ import (
 )
 
 func TestVector(t *testing.T) {
-	t.Run("single", func(t *testing.T) {
+	t.Run("reference", func(t *testing.T) {
 		raw := []byte{
 			0x16, 0x03, 0x01, 0x06, 0xe5, 0x01, 0x00, 0x06, 0xe1, 0x03, 0x03, 0xd7, 0x59, 0xa5, 0x78, 0xbc,
 			0x24, 0x3c, 0x36, 0x1a, 0x5e, 0xbf, 0xa7, 0x8b, 0xe9, 0x15, 0x1e, 0x6d, 0x20, 0x89, 0x15, 0x91,
@@ -125,10 +125,13 @@ func TestVector(t *testing.T) {
 			t.Error(err)
 			return
 		}
-		println(vec.JA3())
-		println("771,4865-4866-4867-49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53,27-16-13-18-65281-10-35-17613-23-0-65037-51-43-11-45-5,4588-29-23-24,0")
+		if vec.JA3String() != "771,4865-4866-4867-49195-49199-49196-49200-52393-52392-49171-49172-156-157-47-53,27-16-13-18-65281-10-35-17613-23-0-65037-51-43-11-45-5,4588-29-23-24,0" {
+			t.Fail()
+		}
+		if vec.JA3() != "52cd623fb0ae988d7de4b26bd5ba9424" {
+			t.Fail()
+		}
 	})
-	return
 	for i := 0; i < len(stages); i++ {
 		st := &stages[i]
 		t.Run(st.key, func(t *testing.T) {
