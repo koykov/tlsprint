@@ -105,32 +105,44 @@ func (vec *vector) Extensions() []Extension {
 
 func (vec *vector) JA3() string {
 	vec.buf = vec.buf[:0]
-	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.rver), 10)
+	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.mver), 10)
 	vec.buf = append(vec.buf, ',')
 
 	if len(vec.chps) > 0 {
+		var c int
 		for i := 0; i < len(vec.chps); i++ {
-			if i > 0 {
+			cs := vec.chps[i]
+			if isGREASE(cs.Raw()) {
+				continue
+			}
+			if c > 0 {
 				vec.buf = append(vec.buf, '-')
 			}
-			vec.buf = strconv.AppendUint(vec.buf, uint64(vec.chps[i].Raw()), 10)
+			vec.buf = strconv.AppendUint(vec.buf, uint64(cs.Raw()), 10)
+			c++
 		}
 		vec.buf = append(vec.buf, ',')
 	}
 
 	ec, ecpf := -1, -1
 	if len(vec.ext) > 0 {
+		var c int
 		for i := 0; i < len(vec.ext); i++ {
-			if i > 0 {
+			ext := vec.ext[i]
+			if isGREASE(ext.Type.Raw()) {
+				continue
+			}
+			if c > 0 {
 				vec.buf = append(vec.buf, '-')
 			}
-			vec.buf = strconv.AppendUint(vec.buf, uint64(vec.ext[i].Type.Raw()), 10)
-			if vec.ext[i].Type.Raw() == 0x000a {
+			vec.buf = strconv.AppendUint(vec.buf, uint64(ext.Type.Raw()), 10)
+			if ext.Type.Raw() == 0x000a {
 				ec = i
 			}
-			if vec.ext[i].Type.Raw() == 0x000b {
+			if ext.Type.Raw() == 0x000b {
 				ecpf = i
 			}
+			c++
 		}
 		vec.buf = append(vec.buf, ',')
 	}
@@ -139,6 +151,9 @@ func (vec *vector) JA3() string {
 		var c int
 		ext := NewExtensionSupportedGroups(vec.ext[ec].Data.Bytes())
 		ext.Each(func(group EllipticCurve) {
+			if isGREASE(group.Raw()) {
+				return
+			}
 			if c > 0 {
 				vec.buf = append(vec.buf, '-')
 			}
@@ -165,10 +180,11 @@ func (vec *vector) JA3() string {
 		}
 	}
 
+	bin := vec.buf[:len(vec.buf)-1]
+	println(string(bin))
 	if vec.ja3 == nil {
 		vec.ja3 = md5.New()
 	}
-	bin := vec.buf[:len(vec.buf)-1]
 	vec.ja3.Reset()
 	vec.ja3.Write(bin)
 	off := len(vec.buf)
