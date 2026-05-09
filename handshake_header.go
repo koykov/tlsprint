@@ -29,6 +29,32 @@ func (mv MessageVersion) Raw() uint16 {
 	return uint16(mv)
 }
 
+func (mv MessageVersion) Lo() uint8 {
+	return uint8(mv >> 8)
+}
+
+func (mv MessageVersion) Hi() uint8 {
+	return uint8(mv)
+}
+
+func (mv MessageVersion) Short() string {
+	lo, hi := byte(mv), byte(mv>>8)
+	switch {
+	case hi == 3 && lo == 0:
+		return "30"
+	case hi == 3 && lo == 1:
+		return "10"
+	case hi == 3 && lo == 2:
+		return "11"
+	case hi == 3 && lo == 3:
+		return "12"
+	case hi == 3 && lo == 4:
+		return "13"
+	default:
+		return "00"
+	}
+}
+
 func (mv MessageVersion) String() string {
 	lo, hi := byte(mv), byte(mv>>8)
 	switch {

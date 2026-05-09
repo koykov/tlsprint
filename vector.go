@@ -28,6 +28,8 @@ type Interface interface {
 	Extensions() []Extension
 	JA3() string
 	JA3String() string
+	JA4() string
+	JA4String() string
 }
 
 type vector struct {

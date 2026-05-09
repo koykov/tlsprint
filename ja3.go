@@ -10,7 +10,7 @@ import (
 
 func (vec *vector) ja3s() []byte {
 	vec.buf = vec.buf[:0]
-	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.mver), 10)
+	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.mver.Raw()), 10)
 	vec.buf = append(vec.buf, ',')
 
 	if len(vec.chps) > 0 {
