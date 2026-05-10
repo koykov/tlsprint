@@ -9,7 +9,7 @@ import (
 )
 
 func (vec *vector) ja3s() []byte {
-	vec.buf = vec.buf[:0]
+	off := len(vec.buf)
 	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.mver.Raw()), 10)
 	vec.buf = append(vec.buf, ',')
 
@@ -85,7 +85,7 @@ func (vec *vector) ja3s() []byte {
 		}
 	}
 
-	bin := vec.buf[:len(vec.buf)-1]
+	bin := vec.buf[off : len(vec.buf)-1]
 	return bin
 }
 

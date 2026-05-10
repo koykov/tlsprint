@@ -6,9 +6,11 @@ func (vec *vector) JA4() string {
 }
 
 func (vec *vector) JA4String() string {
-	vec.buf = vec.buf[:0]
+	off := len(vec.buf)
 
 	vec.buf = append(vec.buf, 't')
 	vec.buf = append(vec.buf, vec.mver.Short()...)
+
+	_ = off
 	return ""
 }

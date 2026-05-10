@@ -162,7 +162,7 @@ func BenchmarkVector(b *testing.B) {
 		st := &stages[i]
 		b.Run(st.key, func(b *testing.B) {
 			b.Run("client hello", func(b *testing.B) {
-				vec := New()
+				vec := &vector{}
 				err := vec.Parse(st.flows[0])
 				if err != nil {
 					b.Fatal(err)
@@ -171,6 +171,7 @@ func BenchmarkVector(b *testing.B) {
 					b.ReportAllocs()
 					b.ResetTimer()
 					for j := 0; j < b.N; j++ {
+						vec.resetBuf()
 						_ = vec.JA3()
 					}
 				})

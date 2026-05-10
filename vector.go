@@ -157,6 +157,7 @@ func (vec *vector) String() string {
 func (vec *vector) Reset() {
 	vec.raw = vec.raw[:0]
 	vec.buf = vec.buf[:0]
+	vec.resetBuf()
 
 	vec.rtyp = RecordTypeUnknown
 	vec.rver = 0
@@ -175,6 +176,10 @@ func (vec *vector) Reset() {
 	if vec.ja3 != nil {
 		vec.ja3.Reset()
 	}
+}
+
+func (vec *vector) resetBuf() {
+	vec.buf = vec.buf[:0]
 }
 
 func (vec *vector) cut(off, delta uint32) ([]byte, uint32, error) {
