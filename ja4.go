@@ -53,7 +53,15 @@ func (vec *vector) JA4String() string {
 		if isGREASE(ext.Type.Raw()) {
 			continue
 		}
-		if ext.Type == 0x0000 {
+		if ext.Type == 0x0010 {
+			ealpn := NewExtensionApplicationLayerProtocolNegotiation(ext.Data.Bytes())
+			var ok bool
+			ealpn.Each(func(protocol []byte) {
+				if len(protocol) >= 2 && !ok {
+					ok = true
+					alpn[0], alpn[1] = protocol[0], protocol[len(protocol)-1]
+				}
+			})
 		}
 		extlen++
 	}
@@ -61,6 +69,7 @@ func (vec *vector) JA4String() string {
 		vec.buf = append(vec.buf, '0')
 	}
 	vec.buf = strconv.AppendInt(vec.buf, int64(extlen), 10)
+	vec.buf = append(vec.buf, alpn[:]...)
 
 	_ = off
 	return ""
