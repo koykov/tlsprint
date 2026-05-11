@@ -46,6 +46,22 @@ func (vec *vector) JA4String() string {
 	}
 	vec.buf = strconv.AppendInt(vec.buf, int64(chlen), 10)
 
+	var extlen int
+	var alpn = [2]byte{'0', '0'}
+	for i := 0; i < len(vec.ext); i++ {
+		ext := vec.ext[i]
+		if isGREASE(ext.Type.Raw()) {
+			continue
+		}
+		if ext.Type == 0x0000 {
+		}
+		extlen++
+	}
+	if extlen < 10 {
+		vec.buf = append(vec.buf, '0')
+	}
+	vec.buf = strconv.AppendInt(vec.buf, int64(extlen), 10)
+
 	_ = off
 	return ""
 }
