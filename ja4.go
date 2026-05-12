@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"slices"
 	"strconv"
+
+	"github.com/koykov/byteconv"
 )
 
 func (vec *vector) JA4() string {
@@ -81,7 +83,7 @@ func (vec *vector) JA4String() string {
 	vec.buf16 = vec.buf16[:0]
 	for i := 0; i < len(vec.chps); i++ {
 		cs := vec.chps[i].Raw()
-		if isGREASE(cs) || cs == 0x0000 || cs == 0x0010 {
+		if isGREASE(cs) {
 			continue
 		}
 		vec.buf16 = append(vec.buf16, cs)
@@ -96,11 +98,15 @@ func (vec *vector) JA4String() string {
 	}
 
 	// extensions part
+	var sig *Extension
 	vec.buf16 = vec.buf16[:0]
 	for i := 0; i < len(vec.ext); i++ {
 		et := vec.ext[i].Type.Raw()
-		if isGREASE(et) {
+		if isGREASE(et) || et == 0x0000 || et == 0x0010 {
 			continue
+		}
+		if et == 0x000d {
+			sig = &vec.ext[i]
 		}
 		vec.buf16 = append(vec.buf16, et)
 	}
@@ -113,6 +119,22 @@ func (vec *vector) JA4String() string {
 		vec.buf = fmt.Appendf(vec.buf, "%04x", vec.buf16[i])
 	}
 
-	_ = off
-	return ""
+	// signature algorithms part
+	if sig != nil {
+		vec.buf = append(vec.buf, '_')
+		ext := NewExtensionSignatureAlgorithms(sig.Data.Bytes())
+		var buf [2]byte
+		var c int
+		ext.Each(func(hash byte, sa SignatureAlgorithm) {
+			if c > 0 {
+				vec.buf = append(vec.buf, ',')
+			}
+			buf[0] = hash
+			buf[1] = sa.Raw()
+			vec.buf = fmt.Appendf(vec.buf, "%04x", buf[:])
+			c++
+		})
+	}
+
+	return byteconv.B2S(vec.buf[off:])
 }
