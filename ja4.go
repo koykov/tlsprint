@@ -1,6 +1,10 @@
 package tlsvector
 
-import "strconv"
+import (
+	"fmt"
+	"slices"
+	"strconv"
+)
 
 func (vec *vector) JA4() string {
 	// todo implement me
@@ -9,6 +13,8 @@ func (vec *vector) JA4() string {
 
 func (vec *vector) JA4String() string {
 	off := len(vec.buf)
+
+	// meta part
 
 	vec.buf = append(vec.buf, 't')
 
@@ -70,6 +76,23 @@ func (vec *vector) JA4String() string {
 	}
 	vec.buf = strconv.AppendInt(vec.buf, int64(extlen), 10)
 	vec.buf = append(vec.buf, alpn[:]...)
+
+	// cipher suites part
+	for i := 0; i < len(vec.chps); i++ {
+		cs := vec.chps[i].Raw()
+		if isGREASE(cs) {
+			continue
+		}
+		vec.buf16 = append(vec.buf16, cs)
+	}
+	slices.Sort(vec.buf16)
+	vec.buf = append(vec.buf, '_')
+	for i := 0; i < len(vec.buf16); i++ {
+		if i > 0 {
+			vec.buf = append(vec.buf, ',')
+		}
+		vec.buf = fmt.Appendf(vec.buf, "%04x", vec.buf16[i])
+	}
 
 	_ = off
 	return ""

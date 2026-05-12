@@ -33,8 +33,9 @@ type Interface interface {
 }
 
 type vector struct {
-	raw []byte
-	buf []byte
+	raw   []byte
+	buf   []byte
+	buf16 []uint16
 
 	rtyp RecordType    // record type (always handshake)
 	rver RecordVersion // record version (legacy)
@@ -156,7 +157,6 @@ func (vec *vector) String() string {
 
 func (vec *vector) Reset() {
 	vec.raw = vec.raw[:0]
-	vec.buf = vec.buf[:0]
 	vec.resetBuf()
 
 	vec.rtyp = RecordTypeUnknown
@@ -180,6 +180,7 @@ func (vec *vector) Reset() {
 
 func (vec *vector) resetBuf() {
 	vec.buf = vec.buf[:0]
+	vec.buf16 = vec.buf16[:0]
 }
 
 func (vec *vector) cut(off, delta uint32) ([]byte, uint32, error) {
