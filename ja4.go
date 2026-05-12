@@ -78,12 +78,31 @@ func (vec *vector) JA4String() string {
 	vec.buf = append(vec.buf, alpn[:]...)
 
 	// cipher suites part
+	vec.buf16 = vec.buf16[:0]
 	for i := 0; i < len(vec.chps); i++ {
 		cs := vec.chps[i].Raw()
-		if isGREASE(cs) {
+		if isGREASE(cs) || cs == 0x0000 || cs == 0x0010 {
 			continue
 		}
 		vec.buf16 = append(vec.buf16, cs)
+	}
+	slices.Sort(vec.buf16)
+	vec.buf = append(vec.buf, '_')
+	for i := 0; i < len(vec.buf16); i++ {
+		if i > 0 {
+			vec.buf = append(vec.buf, ',')
+		}
+		vec.buf = fmt.Appendf(vec.buf, "%04x", vec.buf16[i])
+	}
+
+	// extensions part
+	vec.buf16 = vec.buf16[:0]
+	for i := 0; i < len(vec.ext); i++ {
+		et := vec.ext[i].Type.Raw()
+		if isGREASE(et) {
+			continue
+		}
+		vec.buf16 = append(vec.buf16, et)
 	}
 	slices.Sort(vec.buf16)
 	vec.buf = append(vec.buf, '_')
