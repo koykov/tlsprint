@@ -228,6 +228,7 @@ func (vec *vector) ja4s() (string, uint32, uint32) {
 
 	// extensions part
 	var exlo, exhi uint16
+	exlo = uint16(len(vec.buf) - off)
 	var sig *Extension
 	vec.buf16 = vec.buf16[:0]
 	for i := 0; i < len(vec.ext); i++ {
@@ -265,6 +266,7 @@ func (vec *vector) ja4s() (string, uint32, uint32) {
 			c++
 		})
 	}
+	exhi = uint16(len(vec.buf) - off)
 
-	return byteconv.B2S(vec.buf[off:])
+	return byteconv.B2S(vec.buf[off:]), uint32(cslo)<<16 | uint32(cshi), uint32(exlo)<<16 | uint32(exhi)
 }
