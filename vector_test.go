@@ -152,6 +152,10 @@ func TestVector(t *testing.T) {
 					h := vec.JA3()
 					t.Log(h)
 				})
+				t.Run("ja4", func(t *testing.T) {
+					h := vec.JA4()
+					t.Log(h)
+				})
 			})
 		})
 	}
@@ -173,6 +177,14 @@ func BenchmarkVector(b *testing.B) {
 					for j := 0; j < b.N; j++ {
 						vec.resetBuf()
 						_ = vec.JA3()
+					}
+				})
+				b.Run("ja4", func(b *testing.B) {
+					b.ReportAllocs()
+					b.ResetTimer()
+					for j := 0; j < b.N; j++ {
+						vec.resetBuf()
+						_ = vec.JA4()
 					}
 				})
 			})
