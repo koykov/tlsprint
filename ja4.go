@@ -1,6 +1,8 @@
 package tlsvector
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"slices"
 	"strconv"
@@ -9,16 +11,39 @@ import (
 )
 
 func (vec *vector) JA4() string {
-	// todo implement me
-	return ""
+	raw, cs, ex := vec.ja4s()
+	cslo, cshi := uint16(cs>>16), uint16(cs)
+	exlo, exhi := uint16(ex>>16), uint16(ex)
+	if vec.ja4 == nil {
+		vec.ja4 = sha256.New()
+	}
+	off := len(vec.buf)
+	vec.buf = append(vec.buf, "00000000000000000000000000000000"...)
+	hbuf := vec.buf[off : off+32]
+
+	vec.ja4.Write(raw[cslo:cshi])
+	hbuf = vec.ja4.Sum(hbuf[:0])
+	vec.buf = hex.AppendEncode(vec.buf, hbuf)
+	copy(raw[cslo:cslo+12], vec.buf[off+32:off+32+12])
+	raw[cslo+12] = '_'
+
+	vec.buf = vec.buf[:off+32]
+	vec.ja4.Reset()
+	vec.ja4.Write(raw[exlo:exhi])
+	hbuf = vec.ja4.Sum(hbuf[:0])
+	vec.buf = hex.AppendEncode(vec.buf, hbuf)
+	copy(raw[cslo+13:cslo+13+12], vec.buf[off+32:off+32+12])
+	raw = raw[:cslo+13+12]
+
+	return byteconv.B2S(raw)
 }
 
 func (vec *vector) JA4String() string {
 	raw, _, _ := vec.ja4s()
-	return raw
+	return byteconv.B2S(raw)
 }
 
-func (vec *vector) ja4s() (string, uint32, uint32) {
+func (vec *vector) ja4s() ([]byte, uint32, uint32) {
 	off := len(vec.buf)
 
 	// meta part
@@ -85,8 +110,6 @@ func (vec *vector) ja4s() (string, uint32, uint32) {
 	vec.buf = append(vec.buf, alpn[:]...)
 
 	// cipher suites part
-	var cslo, cshi uint16
-	cslo = uint16(len(vec.buf) - off)
 	vec.buf16 = vec.buf16[:0]
 	for i := 0; i < len(vec.chps); i++ {
 		cs := vec.chps[i].Raw()
@@ -97,6 +120,8 @@ func (vec *vector) ja4s() (string, uint32, uint32) {
 	}
 	slices.Sort(vec.buf16)
 	vec.buf = append(vec.buf, '_')
+	var cslo, cshi uint16
+	cslo = uint16(len(vec.buf) - off)
 	for i := 0; i < len(vec.buf16); i++ {
 		if i > 0 {
 			vec.buf = append(vec.buf, ',')
@@ -106,8 +131,6 @@ func (vec *vector) ja4s() (string, uint32, uint32) {
 	cshi = uint16(len(vec.buf) - off)
 
 	// extensions part
-	var exlo, exhi uint16
-	exlo = uint16(len(vec.buf) - off)
 	var sig *Extension
 	vec.buf16 = vec.buf16[:0]
 	for i := 0; i < len(vec.ext); i++ {
@@ -122,6 +145,8 @@ func (vec *vector) ja4s() (string, uint32, uint32) {
 	}
 	slices.Sort(vec.buf16)
 	vec.buf = append(vec.buf, '_')
+	var exlo, exhi uint16
+	exlo = uint16(len(vec.buf) - off)
 	for i := 0; i < len(vec.buf16); i++ {
 		if i > 0 {
 			vec.buf = append(vec.buf, ',')
@@ -147,5 +172,5 @@ func (vec *vector) ja4s() (string, uint32, uint32) {
 	}
 	exhi = uint16(len(vec.buf) - off)
 
-	return byteconv.B2S(vec.buf[off:]), uint32(cslo)<<16 | uint32(cshi), uint32(exlo)<<16 | uint32(exhi)
+	return vec.buf[off:], uint32(cslo)<<16 | uint32(cshi), uint32(exlo)<<16 | uint32(exhi)
 }

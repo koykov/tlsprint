@@ -51,7 +51,7 @@ type vector struct {
 	cmps uint8          // compression method
 	ext  []Extension    // extensions
 
-	ja3 hash.Hash
+	ja3, ja4 hash.Hash
 }
 
 func New() Interface {
@@ -175,6 +175,9 @@ func (vec *vector) Reset() {
 
 	if vec.ja3 != nil {
 		vec.ja3.Reset()
+	}
+	if vec.ja4 != nil {
+		vec.ja4.Reset()
 	}
 }
 
