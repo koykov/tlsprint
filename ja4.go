@@ -3,7 +3,6 @@ package tlsvector
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"slices"
 	"strconv"
 
@@ -126,7 +125,7 @@ func (vec *vector) ja4s() ([]byte, uint32, uint32) {
 		if i > 0 {
 			vec.buf = append(vec.buf, ',')
 		}
-		vec.buf = fmt.Appendf(vec.buf, "%04x", vec.buf16[i])
+		vec.buf = appendHexU16(vec.buf, vec.buf16[i])
 	}
 	cshi = uint16(len(vec.buf) - off)
 
@@ -151,7 +150,7 @@ func (vec *vector) ja4s() ([]byte, uint32, uint32) {
 		if i > 0 {
 			vec.buf = append(vec.buf, ',')
 		}
-		vec.buf = fmt.Appendf(vec.buf, "%04x", vec.buf16[i])
+		vec.buf = appendHexU16(vec.buf, vec.buf16[i])
 	}
 
 	// signature algorithms part
@@ -166,7 +165,7 @@ func (vec *vector) ja4s() ([]byte, uint32, uint32) {
 			}
 			buf[0] = hash
 			buf[1] = sa.Raw()
-			vec.buf = fmt.Appendf(vec.buf, "%04x", buf[:])
+			vec.buf = appendHexB2(vec.buf, buf)
 			c++
 		})
 	}
