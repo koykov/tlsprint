@@ -33,10 +33,12 @@ func init() {
 	)
 
 	_ = filepath.Walk("testdata", func(path string, info os.FileInfo, err error) error {
-		if filepath.Ext(path) == ".raw" {
+		if info.IsDir() && path != "testdata" {
+			rawfp := fmt.Sprintf("%s%sraw.txt", path, string(os.PathSeparator))
+
 			st := stage{flows: make([][]byte, 15)}
-			st.key = strings.Replace(filepath.Base(path), ".raw", "", 1)
-			st.origin, _ = os.ReadFile(path)
+			st.key = filepath.Base(path)
+			st.origin, _ = os.ReadFile(rawfp)
 
 			buf := make([]byte, 0, 1024)
 			rdr := bytes.NewReader(st.origin)
@@ -76,8 +78,8 @@ func init() {
 				st.flows[flowID] = append(st.flows[flowID], buf...)
 			}
 
-			st.chfmt, _ = os.ReadFile(strings.Replace(path, ".raw", ".chfmt.txt", 1))
-			st.shfmt, _ = os.ReadFile(strings.Replace(path, ".raw", ".shfmt.txt", 1))
+			st.chfmt, _ = os.ReadFile(fmt.Sprintf("%s%sclient_hello.fmt.txt", path, string(os.PathSeparator)))
+			st.shfmt, _ = os.ReadFile(fmt.Sprintf("%s%sserver_hello.fmt.txt", path, string(os.PathSeparator)))
 			stages = append(stages, st)
 			stagesReg[st.key] = len(stages) - 1
 			return nil
