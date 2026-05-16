@@ -1,6 +1,7 @@
 package tlsvector
 
 import (
+	"bytes"
 	"testing"
 )
 
@@ -150,11 +151,15 @@ func TestVector(t *testing.T) {
 				}
 				t.Run("ja3", func(t *testing.T) {
 					h := vec.JA3()
-					t.Log(h)
+					if !bytes.Equal(st.ja3, []byte(h)) {
+						t.Errorf("ja3 mismatch: got '%s', expect '%s'", h, string(st.ja3))
+					}
 				})
 				t.Run("ja4", func(t *testing.T) {
 					h := vec.JA4()
-					t.Log(h)
+					if !bytes.Equal(st.ja4, []byte(h)) {
+						t.Errorf("ja4 mismatch: got '%s', expect '%s'", h, string(st.ja4))
+					}
 				})
 			})
 		})

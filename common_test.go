@@ -15,10 +15,11 @@ import (
 type stage struct {
 	key string
 
-	origin []byte
-	flows  [][]byte
-	chfmt  []byte
-	shfmt  []byte
+	origin   []byte
+	flows    [][]byte
+	chfmt    []byte
+	shfmt    []byte
+	ja3, ja4 []byte
 }
 
 var (
@@ -81,6 +82,8 @@ func init() {
 
 			st.chfmt, _ = os.ReadFile(fmt.Sprintf("%s%sclient_hello.fmt.txt", path, ps))
 			st.shfmt, _ = os.ReadFile(fmt.Sprintf("%s%sserver_hello.fmt.txt", path, ps))
+			st.ja3, _ = os.ReadFile(fmt.Sprintf("%s%sclient_hello.ja3.txt", path, ps))
+			st.ja4, _ = os.ReadFile(fmt.Sprintf("%s%sclient_hello.ja4.txt", path, ps))
 			stages = append(stages, st)
 			stagesReg[st.key] = len(stages) - 1
 			return nil
