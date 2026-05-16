@@ -30,11 +30,12 @@ func init() {
 	var (
 		reFlow    = regexp.MustCompile(`>>> Flow (\d+).*`)
 		rePayload = regexp.MustCompile(`^\S+\s+((?:[0-9a-fA-F]{2}\s+)*[0-9a-fA-F]{2})`)
+		ps        = string(os.PathSeparator)
 	)
 
 	_ = filepath.Walk("testdata", func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() && path != "testdata" {
-			rawfp := fmt.Sprintf("%s%sraw.txt", path, string(os.PathSeparator))
+			rawfp := fmt.Sprintf("%s%sraw.txt", path, ps)
 
 			st := stage{flows: make([][]byte, 15)}
 			st.key = filepath.Base(path)
@@ -78,8 +79,8 @@ func init() {
 				st.flows[flowID] = append(st.flows[flowID], buf...)
 			}
 
-			st.chfmt, _ = os.ReadFile(fmt.Sprintf("%s%sclient_hello.fmt.txt", path, string(os.PathSeparator)))
-			st.shfmt, _ = os.ReadFile(fmt.Sprintf("%s%sserver_hello.fmt.txt", path, string(os.PathSeparator)))
+			st.chfmt, _ = os.ReadFile(fmt.Sprintf("%s%sclient_hello.fmt.txt", path, ps))
+			st.shfmt, _ = os.ReadFile(fmt.Sprintf("%s%sserver_hello.fmt.txt", path, ps))
 			stages = append(stages, st)
 			stagesReg[st.key] = len(stages) - 1
 			return nil
