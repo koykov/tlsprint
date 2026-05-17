@@ -31,7 +31,9 @@ type Extension struct {
 func (e *Extension) AppendDescription(dst []byte, pad string) []byte {
 	descrFn, ok := __ext_descr[e.Type]
 	if !ok {
+		dst = append(dst, pad...)
 		dst = append(dst, "N/D"...)
+		dst = append(dst, '\n')
 		return dst
 	}
 	e.Data.Bytes()

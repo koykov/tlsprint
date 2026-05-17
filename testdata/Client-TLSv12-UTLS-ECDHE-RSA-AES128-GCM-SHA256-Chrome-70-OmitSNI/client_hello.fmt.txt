@@ -30,8 +30,9 @@ Handshake:
 	Compression Method Length: 1
 	Compression Method: NULL (0)
 	Extensions:
-		 (0x0A0A):
-N/D		renegotiation_info (0xFF01):
+		grease (0x0A0A):
+			N/D
+		renegotiation_info (0xFF01):
 			verified_data=00
 		extended_main_secret (0x0017):
 		session_ticket (renamed from "SessionTicket TLS") (0x0023):
@@ -54,8 +55,9 @@ N/D		renegotiation_info (0xFF01):
 		application_layer_protocol_negotiation (0x0010):
 			h2
 			http/1.1
-		 (0x7550):
-N/D		ec_point_formats (0x000B):
+		unknown (0x7550):
+			N/D
+		ec_point_formats (0x000B):
 			uncompressed (0x00) 
 		key_share (0x0033):
 			group=2570 key=00
@@ -74,6 +76,7 @@ N/D		ec_point_formats (0x000B):
 			secp256r1 (0x0017) 
 			secp384r1 (0x0018) 
 		compress_certificate (0x001B):
-		 (0x1A1A):
-N/D		padding (0x0015):
+		grease (0x1A1A):
+			N/D
+		padding (0x0015):
 			221

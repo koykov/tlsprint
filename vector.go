@@ -26,8 +26,10 @@ type Interface interface {
 	CipherSuites() []CipherSuite
 	CompressionMethod() uint8
 	Extensions() []Extension
+
 	JA3() string
 	JA3String() string
+
 	JA4() string
 	JA4String() string
 }
@@ -145,7 +147,14 @@ func (vec *vector) String() string {
 		vec.buf = append(vec.buf, "\tExtensions:\n"...)
 		for i := 0; i < len(vec.ext); i++ {
 			e := &vec.ext[i]
-			vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%04X):\n", e.Type.String(), e.Type.Raw())
+			name := e.Type.String()
+			if isGREASE(e.Type.Raw()) {
+				name = "grease"
+			}
+			if len(name) == 0 {
+				name = "unknown"
+			}
+			vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%04X):\n", name, e.Type.Raw())
 			vec.buf = e.AppendDescription(vec.buf, "\t\t\t")
 		}
 	} else {

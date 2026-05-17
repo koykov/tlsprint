@@ -33,8 +33,9 @@ Handshake:
 	Compression Method Length: 1
 	Compression Method: NULL (0)
 	Extensions:
-		 (0x3374):
-N/D		status_request (0x0005):
+		unknown (0x3374):
+			N/D
+		status_request (0x0005):
 			type=1
 			responder_ids [0]
 			request_ext_len=0
