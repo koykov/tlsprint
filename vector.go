@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"strconv"
 
 	"github.com/koykov/byteconv"
 )
@@ -26,6 +27,8 @@ type Interface interface {
 	CipherSuites() []CipherSuite
 	CompressionMethod() uint8
 	Extensions() []Extension
+
+	JSON() string
 
 	JA3() string
 	JA3String() string
@@ -160,6 +163,76 @@ func (vec *vector) String() string {
 	} else {
 		vec.buf = append(vec.buf, "\tExtensions: N/D\n"...)
 	}
+
+	return byteconv.B2S(vec.buf)
+}
+
+func (vec *vector) JSON() string {
+	vec.buf = vec.buf[:0]
+	vec.buf = append(vec.buf, '{')
+	vec.buf = append(vec.buf, `"record":{`...)
+	vec.buf = append(vec.buf, `"type":"`...)
+	vec.buf = append(vec.buf, vec.rtyp.String()...)
+	vec.buf = append(vec.buf, `",`...)
+	vec.buf = append(vec.buf, `"type_raw":`...)
+	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.rtyp), 10)
+	vec.buf = append(vec.buf, `,"legacy_version":"`...)
+	vec.buf = append(vec.buf, vec.rver.String()...)
+	vec.buf = append(vec.buf, `",legacy_version_raw:`...)
+	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.rver.Raw()), 10)
+	vec.buf = append(vec.buf, `,"length":`...)
+	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.rlen), 10)
+
+	vec.buf = append(vec.buf, `},"handshake":{`...)
+
+	// vec.buf = append(vec.buf, "Handshake:\n"...)
+	// vec.buf = fmt.Appendf(vec.buf, "\tType: %s (0x%02X)\n", vec.mtyp.String(), vec.mtyp.Raw())
+	// vec.buf = fmt.Appendf(vec.buf, "\tLength: %d\n", vec.mlen)
+	// vec.buf = fmt.Appendf(vec.buf, "\tLegacy version: %s (0x%04X)\n", vec.mver.String(), vec.mver.Raw())
+	// vec.buf = fmt.Appendf(vec.buf, "\tRandom: %X\n", vec.Random())
+	// sid := vec.SessionID()
+	// vec.buf = fmt.Appendf(vec.buf, "\tSession ID Length: %d\n", len(sid))
+	// if len(sid) > 0 {
+	// 	vec.buf = fmt.Appendf(vec.buf, "\tSession ID: %X\n", sid)
+	// } else {
+	// 	vec.buf = append(vec.buf, "\tSession ID: N/D\n"...)
+	// }
+	//
+	// if len(vec.chps) > 0 {
+	// 	vec.buf = append(vec.buf, "\tCipher Suites:\n"...)
+	// 	for i := 0; i < len(vec.chps); i++ {
+	// 		vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%02X)\n", vec.chps[i].String(), vec.chps[i].Raw())
+	// 	}
+	// } else {
+	// 	vec.buf = append(vec.buf, "\tCipher Suites: N/D\n"...)
+	// }
+	//
+	// vec.buf = fmt.Appendf(vec.buf, "\tCompression Method Length: %d\n", vec.cmpl)
+	// if vec.cmps == 0 {
+	// 	vec.buf = append(vec.buf, "\tCompression Method: NULL (0)\n"...)
+	// } else {
+	// 	vec.buf = fmt.Appendf(vec.buf, "\tCompression Method: %02X\n", vec.cmps)
+	// }
+	//
+	// if len(vec.ext) > 0 {
+	// 	vec.buf = append(vec.buf, "\tExtensions:\n"...)
+	// 	for i := 0; i < len(vec.ext); i++ {
+	// 		e := &vec.ext[i]
+	// 		name := e.Type.String()
+	// 		if isGREASE(e.Type.Raw()) {
+	// 			name = "grease"
+	// 		}
+	// 		if len(name) == 0 {
+	// 			name = "unknown"
+	// 		}
+	// 		vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%04X):\n", name, e.Type.Raw())
+	// 		vec.buf = e.AppendDescription(vec.buf, "\t\t\t")
+	// 	}
+	// } else {
+	// 	vec.buf = append(vec.buf, "\tExtensions: N/D\n"...)
+	// }
+	vec.buf = append(vec.buf, '}')
+	vec.buf = append(vec.buf, '}')
 
 	return byteconv.B2S(vec.buf)
 }
