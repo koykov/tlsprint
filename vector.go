@@ -226,24 +226,31 @@ func (vec *vector) JSON() string {
 		vec.buf = append(vec.buf, `,"compression_method":`...)
 		vec.buf = strconv.AppendUint(vec.buf, uint64(vec.cmps), 10)
 	}
-	//
-	// if len(vec.ext) > 0 {
-	// 	vec.buf = append(vec.buf, "\tExtensions:\n"...)
-	// 	for i := 0; i < len(vec.exts); i++ {
-	// 		e := &vec.ext[i]
-	// 		name := e.Type.String()
-	// 		if isGREASE(e.Type.Raw()) {
-	// 			name = "grease"
-	// 		}
-	// 		if len(name) == 0 {
-	// 			name = "unknown"
-	// 		}
-	// 		vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%04X):\n", name, e.Type.Raw())
-	// 		vec.buf = e.AppendDescription(vec.buf, "\t\t\t")
-	// 	}
-	// } else {
-	// 	vec.buf = append(vec.buf, "\tExtensions: N/D\n"...)
-	// }
+
+	if len(vec.ext) > 0 {
+		vec.buf = append(vec.buf, `"extensions":[`...)
+		for i := 0; i < len(vec.ext); i++ {
+			if i > 0 {
+				vec.buf = append(vec.buf, ',')
+			}
+			vec.buf = append(vec.buf, `{"name":"`...)
+			e := &vec.ext[i]
+			name := e.Type.String()
+			if isGREASE(e.Type.Raw()) {
+				name = "grease"
+			}
+			if len(name) == 0 {
+				name = "unknown"
+			}
+			vec.buf = append(vec.buf, name...)
+			vec.buf = append(vec.buf, `","type":`...)
+			vec.buf = strconv.AppendUint(vec.buf, uint64(e.Type.Raw()), 10)
+			vec.buf = append(vec.buf, `,`...)
+			// vec.buf = e.AppendDescription(vec.buf, "\t\t\t") // todo append json
+			vec.buf = append(vec.buf, '}')
+		}
+		vec.buf = append(vec.buf, ']')
+	}
 	vec.buf = append(vec.buf, '}')
 	vec.buf = append(vec.buf, '}')
 
