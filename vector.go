@@ -1,6 +1,7 @@
 package tlsvector
 
 import (
+	"encoding/hex"
 	"fmt"
 	"hash"
 	"io"
@@ -184,39 +185,51 @@ func (vec *vector) JSON() string {
 	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.rlen), 10)
 
 	vec.buf = append(vec.buf, `},"handshake":{`...)
+	vec.buf = append(vec.buf, `"type":"`...)
+	vec.buf = append(vec.buf, vec.mtyp.String()...)
+	vec.buf = append(vec.buf, `",`...)
+	vec.buf = append(vec.buf, `"type_raw":`...)
+	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.mtyp.Raw()), 10)
+	vec.buf = append(vec.buf, `,"legacy_version":"`...)
+	vec.buf = append(vec.buf, vec.mver.String()...)
+	vec.buf = append(vec.buf, `",legacy_version_raw:`...)
+	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.mver.Raw()), 10)
+	vec.buf = append(vec.buf, `,"random":"`...)
+	vec.buf = hex.AppendEncode(vec.buf, vec.Random())
+	vec.buf = append(vec.buf, `","session_id_length":`...)
+	sid := vec.SessionID()
+	vec.buf = strconv.AppendUint(vec.buf, uint64(len(sid)), 10)
+	vec.buf = append(vec.buf, ',')
+	if len(sid) > 0 {
+		vec.buf = append(vec.buf, `"session_id":"`...)
+		vec.buf = hex.AppendEncode(vec.buf, sid)
+		vec.buf = append(vec.buf, `",`...)
+	}
+	if len(vec.chps) > 0 {
+		vec.buf = append(vec.buf, `"cipher_suites":[`...)
+		for i := 0; i < len(vec.chps); i++ {
+			if i > 0 {
+				vec.buf = append(vec.buf, ',')
+			}
+			vec.buf = append(vec.buf, `{"name":"`...)
+			vec.buf = append(vec.buf, vec.chps[i].String()...)
+			vec.buf = append(vec.buf, `","value":`...)
+			vec.buf = strconv.AppendUint(vec.buf, uint64(vec.chps[i].Raw()), 10)
+			vec.buf = append(vec.buf, `}`...)
+		}
+		vec.buf = append(vec.buf, `],`...)
+	}
 
-	// vec.buf = append(vec.buf, "Handshake:\n"...)
-	// vec.buf = fmt.Appendf(vec.buf, "\tType: %s (0x%02X)\n", vec.mtyp.String(), vec.mtyp.Raw())
-	// vec.buf = fmt.Appendf(vec.buf, "\tLength: %d\n", vec.mlen)
-	// vec.buf = fmt.Appendf(vec.buf, "\tLegacy version: %s (0x%04X)\n", vec.mver.String(), vec.mver.Raw())
-	// vec.buf = fmt.Appendf(vec.buf, "\tRandom: %X\n", vec.Random())
-	// sid := vec.SessionID()
-	// vec.buf = fmt.Appendf(vec.buf, "\tSession ID Length: %d\n", len(sid))
-	// if len(sid) > 0 {
-	// 	vec.buf = fmt.Appendf(vec.buf, "\tSession ID: %X\n", sid)
-	// } else {
-	// 	vec.buf = append(vec.buf, "\tSession ID: N/D\n"...)
-	// }
-	//
-	// if len(vec.chps) > 0 {
-	// 	vec.buf = append(vec.buf, "\tCipher Suites:\n"...)
-	// 	for i := 0; i < len(vec.chps); i++ {
-	// 		vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%02X)\n", vec.chps[i].String(), vec.chps[i].Raw())
-	// 	}
-	// } else {
-	// 	vec.buf = append(vec.buf, "\tCipher Suites: N/D\n"...)
-	// }
-	//
-	// vec.buf = fmt.Appendf(vec.buf, "\tCompression Method Length: %d\n", vec.cmpl)
-	// if vec.cmps == 0 {
-	// 	vec.buf = append(vec.buf, "\tCompression Method: NULL (0)\n"...)
-	// } else {
-	// 	vec.buf = fmt.Appendf(vec.buf, "\tCompression Method: %02X\n", vec.cmps)
-	// }
+	vec.buf = append(vec.buf, `"compression_method_length":`...)
+	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.cmpl), 10)
+	if vec.cmpl > 0 {
+		vec.buf = append(vec.buf, `,"compression_method":`...)
+		vec.buf = strconv.AppendUint(vec.buf, uint64(vec.cmps), 10)
+	}
 	//
 	// if len(vec.ext) > 0 {
 	// 	vec.buf = append(vec.buf, "\tExtensions:\n"...)
-	// 	for i := 0; i < len(vec.ext); i++ {
+	// 	for i := 0; i < len(vec.exts); i++ {
 	// 		e := &vec.ext[i]
 	// 		name := e.Type.String()
 	// 		if isGREASE(e.Type.Raw()) {

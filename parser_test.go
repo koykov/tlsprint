@@ -15,6 +15,8 @@ func TestParser(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
+				js := vec.JSON()
+				println(js)
 				s := vec.String()
 				if !bytes.Equal([]byte(s), st.chfmt) {
 					t.Errorf("mismatch result and expectation")
