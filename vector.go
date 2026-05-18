@@ -32,6 +32,7 @@ type Interface interface {
 	AppendDescription(dst []byte) []byte
 
 	JSON() string
+	AppendJSON(dst []byte) []byte
 
 	JA3() string
 	JA3String() string
@@ -175,71 +176,75 @@ func (vec *vector) AppendDescription(dst []byte) []byte {
 }
 
 func (vec *vector) JSON() string {
-	vec.buf = vec.buf[:0]
-	vec.buf = append(vec.buf, '{')
-	vec.buf = append(vec.buf, `"record":{`...)
-	vec.buf = append(vec.buf, `"type":"`...)
-	vec.buf = append(vec.buf, vec.rtyp.String()...)
-	vec.buf = append(vec.buf, `",`...)
-	vec.buf = append(vec.buf, `"type_raw":`...)
-	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.rtyp), 10)
-	vec.buf = append(vec.buf, `,"legacy_version":"`...)
-	vec.buf = append(vec.buf, vec.rver.String()...)
-	vec.buf = append(vec.buf, `",legacy_version_raw:`...)
-	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.rver.Raw()), 10)
-	vec.buf = append(vec.buf, `,"length":`...)
-	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.rlen), 10)
+	vec.buf = vec.AppendJSON(vec.buf[:0])
+	return byteconv.B2S(vec.buf)
+}
 
-	vec.buf = append(vec.buf, `},"handshake":{`...)
-	vec.buf = append(vec.buf, `"type":"`...)
-	vec.buf = append(vec.buf, vec.mtyp.String()...)
-	vec.buf = append(vec.buf, `",`...)
-	vec.buf = append(vec.buf, `"type_raw":`...)
-	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.mtyp.Raw()), 10)
-	vec.buf = append(vec.buf, `,"legacy_version":"`...)
-	vec.buf = append(vec.buf, vec.mver.String()...)
-	vec.buf = append(vec.buf, `",legacy_version_raw:`...)
-	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.mver.Raw()), 10)
-	vec.buf = append(vec.buf, `,"random":"`...)
-	vec.buf = hex.AppendEncode(vec.buf, vec.Random())
-	vec.buf = append(vec.buf, `","session_id_length":`...)
+func (vec *vector) AppendJSON(dst []byte) []byte {
+	dst = append(dst, '{')
+	dst = append(dst, `"record":{`...)
+	dst = append(dst, `"type":"`...)
+	dst = append(dst, vec.rtyp.String()...)
+	dst = append(dst, `",`...)
+	dst = append(dst, `"type_raw":`...)
+	dst = strconv.AppendUint(dst, uint64(vec.rtyp), 10)
+	dst = append(dst, `,"legacy_version":"`...)
+	dst = append(dst, vec.rver.String()...)
+	dst = append(dst, `",legacy_version_raw:`...)
+	dst = strconv.AppendUint(dst, uint64(vec.rver.Raw()), 10)
+	dst = append(dst, `,"length":`...)
+	dst = strconv.AppendUint(dst, uint64(vec.rlen), 10)
+
+	dst = append(dst, `},"handshake":{`...)
+	dst = append(dst, `"type":"`...)
+	dst = append(dst, vec.mtyp.String()...)
+	dst = append(dst, `",`...)
+	dst = append(dst, `"type_raw":`...)
+	dst = strconv.AppendUint(dst, uint64(vec.mtyp.Raw()), 10)
+	dst = append(dst, `,"legacy_version":"`...)
+	dst = append(dst, vec.mver.String()...)
+	dst = append(dst, `",legacy_version_raw:`...)
+	dst = strconv.AppendUint(dst, uint64(vec.mver.Raw()), 10)
+	dst = append(dst, `,"random":"`...)
+	dst = hex.AppendEncode(dst, vec.Random())
+	dst = append(dst, `","session_id_length":`...)
 	sid := vec.SessionID()
-	vec.buf = strconv.AppendUint(vec.buf, uint64(len(sid)), 10)
-	vec.buf = append(vec.buf, ',')
+	dst = strconv.AppendUint(dst, uint64(len(sid)), 10)
+	dst = append(dst, ',')
 	if len(sid) > 0 {
-		vec.buf = append(vec.buf, `"session_id":"`...)
-		vec.buf = hex.AppendEncode(vec.buf, sid)
-		vec.buf = append(vec.buf, `",`...)
+		dst = append(dst, `"session_id":"`...)
+		dst = hex.AppendEncode(dst, sid)
+		dst = append(dst, `",`...)
 	}
 	if len(vec.chps) > 0 {
-		vec.buf = append(vec.buf, `"cipher_suites":[`...)
+		dst = append(dst, `"cipher_suites":[`...)
 		for i := 0; i < len(vec.chps); i++ {
 			if i > 0 {
-				vec.buf = append(vec.buf, ',')
+				dst = append(dst, ',')
 			}
-			vec.buf = append(vec.buf, `{"name":"`...)
-			vec.buf = append(vec.buf, vec.chps[i].String()...)
-			vec.buf = append(vec.buf, `","value":`...)
-			vec.buf = strconv.AppendUint(vec.buf, uint64(vec.chps[i].Raw()), 10)
-			vec.buf = append(vec.buf, `}`...)
+			dst = append(dst, `{"name":"`...)
+			dst = append(dst, vec.chps[i].String()...)
+			dst = append(dst, `","value":`...)
+			dst = strconv.AppendUint(dst, uint64(vec.chps[i].Raw()), 10)
+			dst = append(dst, `}`...)
 		}
-		vec.buf = append(vec.buf, `],`...)
+		dst = append(dst, `],`...)
 	}
 
-	vec.buf = append(vec.buf, `"compression_method_length":`...)
-	vec.buf = strconv.AppendUint(vec.buf, uint64(vec.cmpl), 10)
+	dst = append(dst, `"compression_method_length":`...)
+	dst = strconv.AppendUint(dst, uint64(vec.cmpl), 10)
 	if vec.cmpl > 0 {
-		vec.buf = append(vec.buf, `,"compression_method":`...)
-		vec.buf = strconv.AppendUint(vec.buf, uint64(vec.cmps), 10)
+		dst = append(dst, `,"compression_method":`...)
+		dst = strconv.AppendUint(dst, uint64(vec.cmps), 10)
 	}
 
 	if len(vec.ext) > 0 {
-		vec.buf = append(vec.buf, `"extensions":[`...)
+		dst = append(dst, `"extensions":[`...)
 		for i := 0; i < len(vec.ext); i++ {
 			if i > 0 {
-				vec.buf = append(vec.buf, ',')
+				dst = append(dst, ',')
 			}
-			vec.buf = append(vec.buf, `{"name":"`...)
+			dst = append(dst, `{"name":"`...)
 			e := &vec.ext[i]
 			name := e.Type.String()
 			if isGREASE(e.Type.Raw()) {
@@ -248,19 +253,19 @@ func (vec *vector) JSON() string {
 			if len(name) == 0 {
 				name = "unknown"
 			}
-			vec.buf = append(vec.buf, name...)
-			vec.buf = append(vec.buf, `","type":`...)
-			vec.buf = strconv.AppendUint(vec.buf, uint64(e.Type.Raw()), 10)
-			vec.buf = append(vec.buf, `,`...)
-			// vec.buf = e.AppendDescription(vec.buf, "\t\t\t") // todo append json
-			vec.buf = append(vec.buf, '}')
+			dst = append(dst, name...)
+			dst = append(dst, `","type":`...)
+			dst = strconv.AppendUint(dst, uint64(e.Type.Raw()), 10)
+			dst = append(dst, `,`...)
+			// dst = e.AppendDescription(dst, "\t\t\t") // todo append json
+			dst = append(dst, '}')
 		}
-		vec.buf = append(vec.buf, ']')
+		dst = append(dst, ']')
 	}
-	vec.buf = append(vec.buf, '}')
-	vec.buf = append(vec.buf, '}')
+	dst = append(dst, '}')
+	dst = append(dst, '}')
 
-	return byteconv.B2S(vec.buf)
+	return dst
 }
 
 func (vec *vector) Reset() {
