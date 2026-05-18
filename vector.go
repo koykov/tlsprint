@@ -29,6 +29,8 @@ type Interface interface {
 	CompressionMethod() uint8
 	Extensions() []Extension
 
+	AppendDescription(dst []byte) []byte
+
 	JSON() string
 
 	JA3() string
@@ -111,44 +113,48 @@ func (vec *vector) Extensions() []Extension {
 }
 
 func (vec *vector) String() string {
-	vec.buf = vec.buf[:0]
-	vec.buf = append(vec.buf, "Record:\n"...)
+	vec.buf = vec.AppendDescription(vec.buf[:0])
+	return byteconv.B2S(vec.buf)
+}
 
-	vec.buf = fmt.Appendf(vec.buf, "\tType: %s (%d)\n", vec.rtyp.String(), vec.rtyp)
-	vec.buf = fmt.Appendf(vec.buf, "\tLegacy version: %s (0x%04X)\n", vec.rver.String(), vec.rver.Raw())
-	vec.buf = fmt.Appendf(vec.buf, "\tLength: %d\n", vec.rlen)
+func (vec *vector) AppendDescription(dst []byte) []byte {
+	dst = append(dst, "Record:\n"...)
 
-	vec.buf = append(vec.buf, "Handshake:\n"...)
-	vec.buf = fmt.Appendf(vec.buf, "\tType: %s (0x%02X)\n", vec.mtyp.String(), vec.mtyp.Raw())
-	vec.buf = fmt.Appendf(vec.buf, "\tLength: %d\n", vec.mlen)
-	vec.buf = fmt.Appendf(vec.buf, "\tLegacy version: %s (0x%04X)\n", vec.mver.String(), vec.mver.Raw())
-	vec.buf = fmt.Appendf(vec.buf, "\tRandom: %X\n", vec.Random())
+	dst = fmt.Appendf(dst, "\tType: %s (%d)\n", vec.rtyp.String(), vec.rtyp)
+	dst = fmt.Appendf(dst, "\tLegacy version: %s (0x%04X)\n", vec.rver.String(), vec.rver.Raw())
+	dst = fmt.Appendf(dst, "\tLength: %d\n", vec.rlen)
+
+	dst = append(dst, "Handshake:\n"...)
+	dst = fmt.Appendf(dst, "\tType: %s (0x%02X)\n", vec.mtyp.String(), vec.mtyp.Raw())
+	dst = fmt.Appendf(dst, "\tLength: %d\n", vec.mlen)
+	dst = fmt.Appendf(dst, "\tLegacy version: %s (0x%04X)\n", vec.mver.String(), vec.mver.Raw())
+	dst = fmt.Appendf(dst, "\tRandom: %X\n", vec.Random())
 	sid := vec.SessionID()
-	vec.buf = fmt.Appendf(vec.buf, "\tSession ID Length: %d\n", len(sid))
+	dst = fmt.Appendf(dst, "\tSession ID Length: %d\n", len(sid))
 	if len(sid) > 0 {
-		vec.buf = fmt.Appendf(vec.buf, "\tSession ID: %X\n", sid)
+		dst = fmt.Appendf(dst, "\tSession ID: %X\n", sid)
 	} else {
-		vec.buf = append(vec.buf, "\tSession ID: N/D\n"...)
+		dst = append(dst, "\tSession ID: N/D\n"...)
 	}
 
 	if len(vec.chps) > 0 {
-		vec.buf = append(vec.buf, "\tCipher Suites:\n"...)
+		dst = append(dst, "\tCipher Suites:\n"...)
 		for i := 0; i < len(vec.chps); i++ {
-			vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%02X)\n", vec.chps[i].String(), vec.chps[i].Raw())
+			dst = fmt.Appendf(dst, "\t\t%s (0x%02X)\n", vec.chps[i].String(), vec.chps[i].Raw())
 		}
 	} else {
-		vec.buf = append(vec.buf, "\tCipher Suites: N/D\n"...)
+		dst = append(dst, "\tCipher Suites: N/D\n"...)
 	}
 
-	vec.buf = fmt.Appendf(vec.buf, "\tCompression Method Length: %d\n", vec.cmpl)
+	dst = fmt.Appendf(dst, "\tCompression Method Length: %d\n", vec.cmpl)
 	if vec.cmps == 0 {
-		vec.buf = append(vec.buf, "\tCompression Method: NULL (0)\n"...)
+		dst = append(dst, "\tCompression Method: NULL (0)\n"...)
 	} else {
-		vec.buf = fmt.Appendf(vec.buf, "\tCompression Method: %02X\n", vec.cmps)
+		dst = fmt.Appendf(dst, "\tCompression Method: %02X\n", vec.cmps)
 	}
 
 	if len(vec.ext) > 0 {
-		vec.buf = append(vec.buf, "\tExtensions:\n"...)
+		dst = append(dst, "\tExtensions:\n"...)
 		for i := 0; i < len(vec.ext); i++ {
 			e := &vec.ext[i]
 			name := e.Type.String()
@@ -158,14 +164,14 @@ func (vec *vector) String() string {
 			if len(name) == 0 {
 				name = "unknown"
 			}
-			vec.buf = fmt.Appendf(vec.buf, "\t\t%s (0x%04X):\n", name, e.Type.Raw())
-			vec.buf = e.AppendDescription(vec.buf, "\t\t\t")
+			dst = fmt.Appendf(dst, "\t\t%s (0x%04X):\n", name, e.Type.Raw())
+			dst = e.AppendDescription(dst, "\t\t\t")
 		}
 	} else {
-		vec.buf = append(vec.buf, "\tExtensions: N/D\n"...)
+		dst = append(dst, "\tExtensions: N/D\n"...)
 	}
 
-	return byteconv.B2S(vec.buf)
+	return dst
 }
 
 func (vec *vector) JSON() string {
