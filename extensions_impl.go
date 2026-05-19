@@ -57,6 +57,24 @@ func (e *ExtensionServerName) AppendDescription(dst []byte, pad string) []byte {
 	return dst
 }
 
+func (e *ExtensionServerName) AppendJSON(dst []byte) []byte {
+	dst = append(dst, `"items":[`...)
+	var c int
+	e.Each(func(nameType byte, name []byte) {
+		if c > 0 {
+			dst = append(dst, ',')
+		}
+		dst = append(dst, `{"type":`...)
+		dst = strconv.AppendInt(dst, int64(nameType), 10)
+		dst = append(dst, `","name":"`...)
+		dst = append(dst, name...)
+		dst = append(dst, `"}`...)
+		c++
+	})
+	dst = append(dst, ']')
+	return dst
+}
+
 // ---
 
 // ExtensionMaxFragmentLength represents extension "max_fragment_length".
@@ -80,6 +98,12 @@ func (e *ExtensionMaxFragmentLength) AppendDescription(dst []byte, pad string) [
 	dst = append(dst, "max_fragment_length "...)
 	dst = strconv.AppendInt(dst, int64(e.Value()), 10)
 	dst = append(dst, '\n')
+	return dst
+}
+
+func (e *ExtensionMaxFragmentLength) AppendJSON(dst []byte) []byte {
+	dst = append(dst, `"max_fragment_length":`...)
+	dst = strconv.AppendInt(dst, int64(e.Value()), 10)
 	return dst
 }
 
@@ -127,6 +151,22 @@ func (e *ExtensionClientCertificateURL) AppendDescription(dst []byte, pad string
 		dst = append(dst, url...)
 		dst = append(dst, '\n')
 	})
+	return dst
+}
+
+func (e *ExtensionClientCertificateURL) AppendJSON(dst []byte) []byte {
+	dst = append(dst, `"urls":[`...)
+	var c int
+	e.Each(func(url []byte) {
+		if c > 0 {
+			dst = append(dst, ',')
+		}
+		dst = append(dst, '"')
+		dst = append(dst, url...)
+		dst = append(dst, '"')
+		c++
+	})
+	dst = append(dst, ']')
 	return dst
 }
 
@@ -194,6 +234,25 @@ func (e *ExtensionTrustedCAKeys) AppendDescription(dst []byte, pad string) []byt
 	return dst
 }
 
+func (e *ExtensionTrustedCAKeys) AppendJSON(dst []byte) []byte {
+	dst = append(dst, `"keys":[`...)
+	var c int
+	e.Each(func(caID []byte, dnList []byte) {
+		if c > 0 {
+			dst = append(dst, ',')
+		}
+		dst = append(dst, '{')
+		dst = append(dst, `"ca_id":`...)
+		dst = append(dst, caID...)
+		dst = append(dst, `","dn_list":"`...)
+		dst = append(dst, dnList...)
+		dst = append(dst, `"}`...)
+		c++
+	})
+	dst = append(dst, ']')
+	return dst
+}
+
 // ---
 
 // ExtensionTruncatedHMAC represents extension "truncated_hmac".
@@ -221,6 +280,20 @@ func (e *ExtensionTruncatedHMAC) AppendDescription(dst []byte, pad string) []byt
 		dst = strconv.AppendInt(dst, int64(hmacLen), 10)
 		dst = append(dst, '\n')
 	})
+	return dst
+}
+
+func (e *ExtensionTruncatedHMAC) AppendJSON(dst []byte) []byte {
+	dst = append(dst, `"hmac":[`...)
+	var c int
+	e.Each(func(hmacLen byte) {
+		if c > 0 {
+			dst = append(dst, ',')
+		}
+		dst = strconv.AppendInt(dst, int64(hmacLen), 10)
+		c++
+	})
+	dst = append(dst, ']')
 	return dst
 }
 
