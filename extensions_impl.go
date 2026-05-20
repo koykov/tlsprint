@@ -643,6 +643,20 @@ func (e *ExtensionCertType) AppendDescription(dst []byte, pad string) []byte {
 	return dst
 }
 
+func (e *ExtensionCertType) AppendJSON(dst []byte) []byte {
+	dst = append(dst, `"items":[`...)
+	var c int
+	e.Each(func(certType byte) {
+		if c > 0 {
+			dst = append(dst, ',')
+		}
+		dst = strconv.AppendInt(dst, int64(certType), 10)
+		c++
+	})
+	dst = append(dst, ']')
+	return dst
+}
+
 // ---
 
 // ExtensionSupportedGroups represents extension "supported_groups".
