@@ -587,6 +587,22 @@ func (e *ExtensionServerAuthz) AppendDescription(dst []byte, pad string) []byte 
 	return dst
 }
 
+func (e *ExtensionServerAuthz) AppendJSON(dst []byte) []byte {
+	dst = append(dst, `"items":[`...)
+	var c int
+	e.Each(func(authzData []byte) {
+		if c > 0 {
+			dst = append(dst, ',')
+		}
+		dst = append(dst, '"')
+		dst = append(dst, authzData...)
+		dst = append(dst, '"')
+		c++
+	})
+	dst = append(dst, ']')
+	return dst
+}
+
 // ---
 
 // ExtensionCertType represents extension "cert_type".
