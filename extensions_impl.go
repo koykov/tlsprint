@@ -452,6 +452,25 @@ func (e *ExtensionUserMapping) AppendDescription(dst []byte, pad string) []byte 
 	return dst
 }
 
+func (e *ExtensionUserMapping) AppendJSON(dst []byte) []byte {
+	dst = append(dst, `"items":[`...)
+	var c int
+	e.Each(func(mappingType byte, data []byte) {
+		if c > 0 {
+			dst = append(dst, ',')
+		}
+		dst = append(dst, '{')
+		dst = append(dst, `"type":`...)
+		dst = strconv.AppendInt(dst, int64(mappingType), 10)
+		dst = append(dst, `,"data":"`...)
+		dst = append(dst, data...)
+		dst = append(dst, `"}`...)
+		c++
+	})
+	dst = append(dst, ']')
+	return dst
+}
+
 // ---
 
 // ExtensionClientAuthz represents extension "client_authz".
