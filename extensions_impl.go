@@ -372,6 +372,28 @@ func (e *ExtensionStatusRequest) AppendDescription(dst []byte, pad string) []byt
 	return dst
 }
 
+func (e *ExtensionStatusRequest) AppendJSON(dst []byte) []byte {
+	dst = append(dst, `"type":`...)
+	dst = strconv.AppendInt(dst, int64(e.StatusType()), 10)
+	dst = append(dst, `,"responder_ids_len":`...)
+	dst = strconv.AppendInt(dst, int64(e.ResponderIDListLength()), 10)
+	dst = append(dst, `,"items":[`...)
+	var c int
+	e.Each(func(id []byte) {
+		if c > 0 {
+			dst = append(dst, ',')
+		}
+		dst = append(dst, '"')
+		dst = append(dst, id...)
+		dst = append(dst, '"')
+		c++
+	})
+	dst = append(dst, `],`...)
+	dst = append(dst, `"request_ext_len":`...)
+	dst = strconv.AppendInt(dst, int64(e.RequestExtensionLength()), 10)
+	return dst
+}
+
 // ---
 
 // ExtensionUserMapping represents extension "user_mapping".
